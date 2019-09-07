@@ -3,6 +3,7 @@ import uuid from 'uuid/v4';
 const Mutation = {
     createUser(parent, args, {
         db
+
     }, info) {
         const isEmailTaken = db.users.some(user => user.email === args.data.email);
         if (isEmailTaken)
@@ -28,6 +29,7 @@ const Mutation = {
             subscribers: []
         }
         db.users.push(user);
+
         return user;
     },
 
@@ -78,7 +80,7 @@ const Mutation = {
 
         return user;
 
-    }
+    },
 
     // createVideo(parent, args, {db}, info) {
     //     const uploaderExists = db.users.some(user => user.id === args.uploader);
@@ -87,15 +89,52 @@ const Mutation = {
     //     //kreiraj video, generisi random ID(uuid) dodaj ga u db.videos i vrati ga
     // },
 
-    // createComment(parent, args, {db}, info) {
-    //     const authorExists = db.users.any(user => user.id === args.author);
-    //     if (!authorExists)
-    //         throw new Error("Author does not exist.");
-    //     const videoExists = db.videos.any(video => video.id === args.video);
-    //     if (!videoExists)
-    //         throw new Error("Video does not exist.");
-    //     //Kreiraj komentar, dodaj ga u komentare i vrati
-    // }
+    createComment(parent, args, {
+        db,
+        pubsub
+    }, info) {
+        const authorExists = db.users.any(user => user.id === args.author);
+        if (!authorExists)
+            throw new Error("Author does not exist.");
+        const videoExists = db.videos.any(video => video.id === args.video);
+        if (!videoExists)
+            throw new Error("Video does not exist.");
+
+        const comment = {
+            id: uuid(),
+            ...args.data
+        };
+
+        db.comments.push(comment);
+        pubsub.publish(`comment ${args.data.video}`, {
+            comment: {
+                mutation: "CREATED",
+                data: comment
+            }
+        });
+
+        return comment;
+    },
+
+    // deleteComment(parent, args, {
+    //     db,
+    //     pubsub
+    // }, info) {
+    //     const commentIndex = db.comments.findIndex(comment => comment.id === args.id);
+
+    //     if (commentIndex === -1)
+    //         throw new Error("Comment not found");
+
+    //     const [deletedComment] = db.coments.splice(commentIndex, 1);
+    //     pubsub.publish(`comment ${deletedComment.video}`, {
+    //         comment: {
+    //             mutation: "DELETED",
+    //             data: deletedComment
+    //         }
+    //     })
+    // },
+
+    //Isto za updateComment
 }
 
 export default Mutation;

@@ -1,5 +1,6 @@
 import {
-    GraphQLServer
+    GraphQLServer,
+    PubSub
 } from "graphql-yoga";
 import uuid from "uuid/v4";
 import db from "./db";
@@ -26,12 +27,15 @@ const resolvers = {
     Comment
 }
 
+const pubsup = new PubSub();
+
 //Define and run GraphQL server
 const server = new GraphQLServer({
     typeDefs: "./src/schema.graphql",
     resolvers,
     context: {
-        db
+        db,
+        pubsup
     }
 });
 server.start(() => {
