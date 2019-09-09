@@ -1,0 +1,83 @@
+type User {
+  id: ID!
+  username: String!
+  email: String!
+  firstName: String
+  lastName: String
+  channelDescription: String
+  isBlocked: Boolean
+  isDeleted: Boolean
+  role: Role
+  subscribers: [User!]!
+}
+
+enum Role {
+  ADMIN
+  STANDARD
+}
+
+type Video {
+  id: ID!
+  url: String!
+  description: String
+  visibility: Visibility!
+  isCommentingAllowed: Boolean!
+  isRatingVisible: Boolean!
+  isBlocked: Boolean
+  views: Int!
+  uploader: User!
+}
+
+enum Visibility {
+  PUBLIC
+  UNLISTED
+  PRIVATE
+}
+
+type Comment {
+  id: ID!
+  content: String!
+  author: User!
+  video: Video!
+}
+
+type Query {
+  greeting(name: String): String!
+  me: User!
+  users(query: String): [User!]!
+}
+
+type Mutation {
+  createUser(data: CreateUserInput!): User!
+  deleteUser(id: ID!): User!
+  updateUser(id: ID!, data: UpdateUserInput!): User!
+  createVideo(url: String!, description: String, uploader: ID!): Video!
+  createComment(content: String!, author: ID!, video: ID!): Comment!
+}
+
+type Subscription {
+  comment(videoId: ID!): CommentSubscriptionPayload!
+}
+
+enum MutationType {
+  CREATED
+  UPDATED
+  DELETED
+}
+
+type CommentSubscriptionPayload {
+  mutation: MutationType!
+  data: Comment!
+}
+
+input CreateUserInput {
+  username: String!
+  email: String!
+  role: Role
+}
+
+input UpdateUserInput {
+  email: String
+  role: Role
+  firstName: String
+}

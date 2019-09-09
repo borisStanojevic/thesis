@@ -1,0 +1,1478 @@
+# source: http://localhost:4466
+# timestamp: Mon Sep 09 2019 02:39:37 GMT+0200 (Central European Summer Time)
+
+type AggregateComment {
+  count: Int!
+}
+
+type AggregateUser {
+  count: Int!
+}
+
+type AggregateVideo {
+  count: Int!
+}
+
+type BatchPayload {
+  """The number of nodes that have been affected by the Batch operation."""
+  count: Long!
+}
+
+type Comment implements Node {
+  id: ID!
+  content: String!
+  author(where: UserWhereInput): User!
+  video(where: VideoWhereInput): Video!
+  likes: Int!
+  dislikes: Int!
+}
+
+"""A connection to a list of items."""
+type CommentConnection {
+  """Information to aid in pagination."""
+  pageInfo: PageInfo!
+
+  """A list of edges."""
+  edges: [CommentEdge]!
+  aggregate: AggregateComment!
+}
+
+input CommentCreateInput {
+  content: String!
+  likes: Int!
+  dislikes: Int!
+  author: UserCreateOneWithoutCommentsPostedInput!
+  video: VideoCreateOneWithoutCommentsInput!
+}
+
+input CommentCreateManyWithoutAuthorInput {
+  create: [CommentCreateWithoutAuthorInput!]
+  connect: [CommentWhereUniqueInput!]
+}
+
+input CommentCreateManyWithoutVideoInput {
+  create: [CommentCreateWithoutVideoInput!]
+  connect: [CommentWhereUniqueInput!]
+}
+
+input CommentCreateWithoutAuthorInput {
+  content: String!
+  likes: Int!
+  dislikes: Int!
+  video: VideoCreateOneWithoutCommentsInput!
+}
+
+input CommentCreateWithoutVideoInput {
+  content: String!
+  likes: Int!
+  dislikes: Int!
+  author: UserCreateOneWithoutCommentsPostedInput!
+}
+
+"""An edge in a connection."""
+type CommentEdge {
+  """The item at the end of the edge."""
+  node: Comment!
+
+  """A cursor for use in pagination."""
+  cursor: String!
+}
+
+enum CommentOrderByInput {
+  id_ASC
+  id_DESC
+  content_ASC
+  content_DESC
+  likes_ASC
+  likes_DESC
+  dislikes_ASC
+  dislikes_DESC
+  updatedAt_ASC
+  updatedAt_DESC
+  createdAt_ASC
+  createdAt_DESC
+}
+
+type CommentPreviousValues {
+  id: ID!
+  content: String!
+  likes: Int!
+  dislikes: Int!
+}
+
+type CommentSubscriptionPayload {
+  mutation: MutationType!
+  node: Comment
+  updatedFields: [String!]
+  previousValues: CommentPreviousValues
+}
+
+input CommentSubscriptionWhereInput {
+  """Logical AND on all given filters."""
+  AND: [CommentSubscriptionWhereInput!]
+
+  """Logical OR on all given filters."""
+  OR: [CommentSubscriptionWhereInput!]
+
+  """Logical NOT on all given filters combined by AND."""
+  NOT: [CommentSubscriptionWhereInput!]
+
+  """
+  The subscription event gets dispatched when it's listed in mutation_in
+  """
+  mutation_in: [MutationType!]
+
+  """
+  The subscription event gets only dispatched when one of the updated fields names is included in this list
+  """
+  updatedFields_contains: String
+
+  """
+  The subscription event gets only dispatched when all of the field names included in this list have been updated
+  """
+  updatedFields_contains_every: [String!]
+
+  """
+  The subscription event gets only dispatched when some of the field names included in this list have been updated
+  """
+  updatedFields_contains_some: [String!]
+  node: CommentWhereInput
+}
+
+input CommentUpdateInput {
+  content: String
+  likes: Int
+  dislikes: Int
+  author: UserUpdateOneWithoutCommentsPostedInput
+  video: VideoUpdateOneWithoutCommentsInput
+}
+
+input CommentUpdateManyWithoutAuthorInput {
+  create: [CommentCreateWithoutAuthorInput!]
+  connect: [CommentWhereUniqueInput!]
+  disconnect: [CommentWhereUniqueInput!]
+  delete: [CommentWhereUniqueInput!]
+  update: [CommentUpdateWithWhereUniqueWithoutAuthorInput!]
+  upsert: [CommentUpsertWithWhereUniqueWithoutAuthorInput!]
+}
+
+input CommentUpdateManyWithoutVideoInput {
+  create: [CommentCreateWithoutVideoInput!]
+  connect: [CommentWhereUniqueInput!]
+  disconnect: [CommentWhereUniqueInput!]
+  delete: [CommentWhereUniqueInput!]
+  update: [CommentUpdateWithWhereUniqueWithoutVideoInput!]
+  upsert: [CommentUpsertWithWhereUniqueWithoutVideoInput!]
+}
+
+input CommentUpdateWithoutAuthorDataInput {
+  content: String
+  likes: Int
+  dislikes: Int
+  video: VideoUpdateOneWithoutCommentsInput
+}
+
+input CommentUpdateWithoutVideoDataInput {
+  content: String
+  likes: Int
+  dislikes: Int
+  author: UserUpdateOneWithoutCommentsPostedInput
+}
+
+input CommentUpdateWithWhereUniqueWithoutAuthorInput {
+  where: CommentWhereUniqueInput!
+  data: CommentUpdateWithoutAuthorDataInput!
+}
+
+input CommentUpdateWithWhereUniqueWithoutVideoInput {
+  where: CommentWhereUniqueInput!
+  data: CommentUpdateWithoutVideoDataInput!
+}
+
+input CommentUpsertWithWhereUniqueWithoutAuthorInput {
+  where: CommentWhereUniqueInput!
+  update: CommentUpdateWithoutAuthorDataInput!
+  create: CommentCreateWithoutAuthorInput!
+}
+
+input CommentUpsertWithWhereUniqueWithoutVideoInput {
+  where: CommentWhereUniqueInput!
+  update: CommentUpdateWithoutVideoDataInput!
+  create: CommentCreateWithoutVideoInput!
+}
+
+input CommentWhereInput {
+  """Logical AND on all given filters."""
+  AND: [CommentWhereInput!]
+
+  """Logical OR on all given filters."""
+  OR: [CommentWhereInput!]
+
+  """Logical NOT on all given filters combined by AND."""
+  NOT: [CommentWhereInput!]
+  id: ID
+
+  """All values that are not equal to given value."""
+  id_not: ID
+
+  """All values that are contained in given list."""
+  id_in: [ID!]
+
+  """All values that are not contained in given list."""
+  id_not_in: [ID!]
+
+  """All values less than the given value."""
+  id_lt: ID
+
+  """All values less than or equal the given value."""
+  id_lte: ID
+
+  """All values greater than the given value."""
+  id_gt: ID
+
+  """All values greater than or equal the given value."""
+  id_gte: ID
+
+  """All values containing the given string."""
+  id_contains: ID
+
+  """All values not containing the given string."""
+  id_not_contains: ID
+
+  """All values starting with the given string."""
+  id_starts_with: ID
+
+  """All values not starting with the given string."""
+  id_not_starts_with: ID
+
+  """All values ending with the given string."""
+  id_ends_with: ID
+
+  """All values not ending with the given string."""
+  id_not_ends_with: ID
+  content: String
+
+  """All values that are not equal to given value."""
+  content_not: String
+
+  """All values that are contained in given list."""
+  content_in: [String!]
+
+  """All values that are not contained in given list."""
+  content_not_in: [String!]
+
+  """All values less than the given value."""
+  content_lt: String
+
+  """All values less than or equal the given value."""
+  content_lte: String
+
+  """All values greater than the given value."""
+  content_gt: String
+
+  """All values greater than or equal the given value."""
+  content_gte: String
+
+  """All values containing the given string."""
+  content_contains: String
+
+  """All values not containing the given string."""
+  content_not_contains: String
+
+  """All values starting with the given string."""
+  content_starts_with: String
+
+  """All values not starting with the given string."""
+  content_not_starts_with: String
+
+  """All values ending with the given string."""
+  content_ends_with: String
+
+  """All values not ending with the given string."""
+  content_not_ends_with: String
+  likes: Int
+
+  """All values that are not equal to given value."""
+  likes_not: Int
+
+  """All values that are contained in given list."""
+  likes_in: [Int!]
+
+  """All values that are not contained in given list."""
+  likes_not_in: [Int!]
+
+  """All values less than the given value."""
+  likes_lt: Int
+
+  """All values less than or equal the given value."""
+  likes_lte: Int
+
+  """All values greater than the given value."""
+  likes_gt: Int
+
+  """All values greater than or equal the given value."""
+  likes_gte: Int
+  dislikes: Int
+
+  """All values that are not equal to given value."""
+  dislikes_not: Int
+
+  """All values that are contained in given list."""
+  dislikes_in: [Int!]
+
+  """All values that are not contained in given list."""
+  dislikes_not_in: [Int!]
+
+  """All values less than the given value."""
+  dislikes_lt: Int
+
+  """All values less than or equal the given value."""
+  dislikes_lte: Int
+
+  """All values greater than the given value."""
+  dislikes_gt: Int
+
+  """All values greater than or equal the given value."""
+  dislikes_gte: Int
+  author: UserWhereInput
+  video: VideoWhereInput
+}
+
+input CommentWhereUniqueInput {
+  id: ID
+}
+
+"""
+The `Long` scalar type represents non-fractional signed whole numeric values.
+Long can represent values between -(2^63) and 2^63 - 1.
+"""
+scalar Long
+
+type Mutation {
+  createVideo(data: VideoCreateInput!): Video!
+  createComment(data: CommentCreateInput!): Comment!
+  createUser(data: UserCreateInput!): User!
+  updateVideo(data: VideoUpdateInput!, where: VideoWhereUniqueInput!): Video
+  updateComment(data: CommentUpdateInput!, where: CommentWhereUniqueInput!): Comment
+  updateUser(data: UserUpdateInput!, where: UserWhereUniqueInput!): User
+  deleteVideo(where: VideoWhereUniqueInput!): Video
+  deleteComment(where: CommentWhereUniqueInput!): Comment
+  deleteUser(where: UserWhereUniqueInput!): User
+  upsertVideo(where: VideoWhereUniqueInput!, create: VideoCreateInput!, update: VideoUpdateInput!): Video!
+  upsertComment(where: CommentWhereUniqueInput!, create: CommentCreateInput!, update: CommentUpdateInput!): Comment!
+  upsertUser(where: UserWhereUniqueInput!, create: UserCreateInput!, update: UserUpdateInput!): User!
+  updateManyVideos(data: VideoUpdateInput!, where: VideoWhereInput): BatchPayload!
+  updateManyComments(data: CommentUpdateInput!, where: CommentWhereInput): BatchPayload!
+  updateManyUsers(data: UserUpdateInput!, where: UserWhereInput): BatchPayload!
+  deleteManyVideos(where: VideoWhereInput): BatchPayload!
+  deleteManyComments(where: CommentWhereInput): BatchPayload!
+  deleteManyUsers(where: UserWhereInput): BatchPayload!
+}
+
+enum MutationType {
+  CREATED
+  UPDATED
+  DELETED
+}
+
+"""An object with an ID"""
+interface Node {
+  """The id of the object."""
+  id: ID!
+}
+
+"""Information about pagination in a connection."""
+type PageInfo {
+  """When paginating forwards, are there more items?"""
+  hasNextPage: Boolean!
+
+  """When paginating backwards, are there more items?"""
+  hasPreviousPage: Boolean!
+
+  """When paginating backwards, the cursor to continue."""
+  startCursor: String
+
+  """When paginating forwards, the cursor to continue."""
+  endCursor: String
+}
+
+type Query {
+  videos(where: VideoWhereInput, orderBy: VideoOrderByInput, skip: Int, after: String, before: String, first: Int, last: Int): [Video]!
+  comments(where: CommentWhereInput, orderBy: CommentOrderByInput, skip: Int, after: String, before: String, first: Int, last: Int): [Comment]!
+  users(where: UserWhereInput, orderBy: UserOrderByInput, skip: Int, after: String, before: String, first: Int, last: Int): [User]!
+  video(where: VideoWhereUniqueInput!): Video
+  comment(where: CommentWhereUniqueInput!): Comment
+  user(where: UserWhereUniqueInput!): User
+  videosConnection(where: VideoWhereInput, orderBy: VideoOrderByInput, skip: Int, after: String, before: String, first: Int, last: Int): VideoConnection!
+  commentsConnection(where: CommentWhereInput, orderBy: CommentOrderByInput, skip: Int, after: String, before: String, first: Int, last: Int): CommentConnection!
+  usersConnection(where: UserWhereInput, orderBy: UserOrderByInput, skip: Int, after: String, before: String, first: Int, last: Int): UserConnection!
+
+  """Fetches an object given its ID"""
+  node(
+    """The ID of an object"""
+    id: ID!
+  ): Node
+}
+
+enum Role {
+  ADMIN
+  STANDARD
+}
+
+type Subscription {
+  video(where: VideoSubscriptionWhereInput): VideoSubscriptionPayload
+  comment(where: CommentSubscriptionWhereInput): CommentSubscriptionPayload
+  user(where: UserSubscriptionWhereInput): UserSubscriptionPayload
+}
+
+type User implements Node {
+  id: ID!
+  email: String!
+  firstName: String
+  lastName: String
+  profilePicture: String!
+  channelDescription: String
+  isBlocked: Boolean!
+  role: Role
+  subscribers(where: UserWhereInput, orderBy: UserOrderByInput, skip: Int, after: String, before: String, first: Int, last: Int): [User!]
+  uploadedVideos(where: VideoWhereInput, orderBy: VideoOrderByInput, skip: Int, after: String, before: String, first: Int, last: Int): [Video!]
+  commentsPosted(where: CommentWhereInput, orderBy: CommentOrderByInput, skip: Int, after: String, before: String, first: Int, last: Int): [Comment!]
+}
+
+"""A connection to a list of items."""
+type UserConnection {
+  """Information to aid in pagination."""
+  pageInfo: PageInfo!
+
+  """A list of edges."""
+  edges: [UserEdge]!
+  aggregate: AggregateUser!
+}
+
+input UserCreateInput {
+  email: String!
+  firstName: String
+  lastName: String
+  profilePicture: String!
+  channelDescription: String
+  isBlocked: Boolean!
+  role: Role
+  subscribers: UserCreateManyInput
+  uploadedVideos: VideoCreateManyWithoutUploaderInput
+  commentsPosted: CommentCreateManyWithoutAuthorInput
+}
+
+input UserCreateManyInput {
+  create: [UserCreateInput!]
+  connect: [UserWhereUniqueInput!]
+}
+
+input UserCreateOneWithoutCommentsPostedInput {
+  create: UserCreateWithoutCommentsPostedInput
+  connect: UserWhereUniqueInput
+}
+
+input UserCreateOneWithoutUploadedVideosInput {
+  create: UserCreateWithoutUploadedVideosInput
+  connect: UserWhereUniqueInput
+}
+
+input UserCreateWithoutCommentsPostedInput {
+  email: String!
+  firstName: String
+  lastName: String
+  profilePicture: String!
+  channelDescription: String
+  isBlocked: Boolean!
+  role: Role
+  subscribers: UserCreateManyInput
+  uploadedVideos: VideoCreateManyWithoutUploaderInput
+}
+
+input UserCreateWithoutUploadedVideosInput {
+  email: String!
+  firstName: String
+  lastName: String
+  profilePicture: String!
+  channelDescription: String
+  isBlocked: Boolean!
+  role: Role
+  subscribers: UserCreateManyInput
+  commentsPosted: CommentCreateManyWithoutAuthorInput
+}
+
+"""An edge in a connection."""
+type UserEdge {
+  """The item at the end of the edge."""
+  node: User!
+
+  """A cursor for use in pagination."""
+  cursor: String!
+}
+
+enum UserOrderByInput {
+  id_ASC
+  id_DESC
+  email_ASC
+  email_DESC
+  firstName_ASC
+  firstName_DESC
+  lastName_ASC
+  lastName_DESC
+  profilePicture_ASC
+  profilePicture_DESC
+  channelDescription_ASC
+  channelDescription_DESC
+  isBlocked_ASC
+  isBlocked_DESC
+  role_ASC
+  role_DESC
+  updatedAt_ASC
+  updatedAt_DESC
+  createdAt_ASC
+  createdAt_DESC
+}
+
+type UserPreviousValues {
+  id: ID!
+  email: String!
+  firstName: String
+  lastName: String
+  profilePicture: String!
+  channelDescription: String
+  isBlocked: Boolean!
+  role: Role
+}
+
+type UserSubscriptionPayload {
+  mutation: MutationType!
+  node: User
+  updatedFields: [String!]
+  previousValues: UserPreviousValues
+}
+
+input UserSubscriptionWhereInput {
+  """Logical AND on all given filters."""
+  AND: [UserSubscriptionWhereInput!]
+
+  """Logical OR on all given filters."""
+  OR: [UserSubscriptionWhereInput!]
+
+  """Logical NOT on all given filters combined by AND."""
+  NOT: [UserSubscriptionWhereInput!]
+
+  """
+  The subscription event gets dispatched when it's listed in mutation_in
+  """
+  mutation_in: [MutationType!]
+
+  """
+  The subscription event gets only dispatched when one of the updated fields names is included in this list
+  """
+  updatedFields_contains: String
+
+  """
+  The subscription event gets only dispatched when all of the field names included in this list have been updated
+  """
+  updatedFields_contains_every: [String!]
+
+  """
+  The subscription event gets only dispatched when some of the field names included in this list have been updated
+  """
+  updatedFields_contains_some: [String!]
+  node: UserWhereInput
+}
+
+input UserUpdateDataInput {
+  email: String
+  firstName: String
+  lastName: String
+  profilePicture: String
+  channelDescription: String
+  isBlocked: Boolean
+  role: Role
+  subscribers: UserUpdateManyInput
+  uploadedVideos: VideoUpdateManyWithoutUploaderInput
+  commentsPosted: CommentUpdateManyWithoutAuthorInput
+}
+
+input UserUpdateInput {
+  email: String
+  firstName: String
+  lastName: String
+  profilePicture: String
+  channelDescription: String
+  isBlocked: Boolean
+  role: Role
+  subscribers: UserUpdateManyInput
+  uploadedVideos: VideoUpdateManyWithoutUploaderInput
+  commentsPosted: CommentUpdateManyWithoutAuthorInput
+}
+
+input UserUpdateManyInput {
+  create: [UserCreateInput!]
+  connect: [UserWhereUniqueInput!]
+  disconnect: [UserWhereUniqueInput!]
+  delete: [UserWhereUniqueInput!]
+  update: [UserUpdateWithWhereUniqueNestedInput!]
+  upsert: [UserUpsertWithWhereUniqueNestedInput!]
+}
+
+input UserUpdateOneWithoutCommentsPostedInput {
+  create: UserCreateWithoutCommentsPostedInput
+  connect: UserWhereUniqueInput
+  delete: Boolean
+  update: UserUpdateWithoutCommentsPostedDataInput
+  upsert: UserUpsertWithoutCommentsPostedInput
+}
+
+input UserUpdateOneWithoutUploadedVideosInput {
+  create: UserCreateWithoutUploadedVideosInput
+  connect: UserWhereUniqueInput
+  delete: Boolean
+  update: UserUpdateWithoutUploadedVideosDataInput
+  upsert: UserUpsertWithoutUploadedVideosInput
+}
+
+input UserUpdateWithoutCommentsPostedDataInput {
+  email: String
+  firstName: String
+  lastName: String
+  profilePicture: String
+  channelDescription: String
+  isBlocked: Boolean
+  role: Role
+  subscribers: UserUpdateManyInput
+  uploadedVideos: VideoUpdateManyWithoutUploaderInput
+}
+
+input UserUpdateWithoutUploadedVideosDataInput {
+  email: String
+  firstName: String
+  lastName: String
+  profilePicture: String
+  channelDescription: String
+  isBlocked: Boolean
+  role: Role
+  subscribers: UserUpdateManyInput
+  commentsPosted: CommentUpdateManyWithoutAuthorInput
+}
+
+input UserUpdateWithWhereUniqueNestedInput {
+  where: UserWhereUniqueInput!
+  data: UserUpdateDataInput!
+}
+
+input UserUpsertWithoutCommentsPostedInput {
+  update: UserUpdateWithoutCommentsPostedDataInput!
+  create: UserCreateWithoutCommentsPostedInput!
+}
+
+input UserUpsertWithoutUploadedVideosInput {
+  update: UserUpdateWithoutUploadedVideosDataInput!
+  create: UserCreateWithoutUploadedVideosInput!
+}
+
+input UserUpsertWithWhereUniqueNestedInput {
+  where: UserWhereUniqueInput!
+  update: UserUpdateDataInput!
+  create: UserCreateInput!
+}
+
+input UserWhereInput {
+  """Logical AND on all given filters."""
+  AND: [UserWhereInput!]
+
+  """Logical OR on all given filters."""
+  OR: [UserWhereInput!]
+
+  """Logical NOT on all given filters combined by AND."""
+  NOT: [UserWhereInput!]
+  id: ID
+
+  """All values that are not equal to given value."""
+  id_not: ID
+
+  """All values that are contained in given list."""
+  id_in: [ID!]
+
+  """All values that are not contained in given list."""
+  id_not_in: [ID!]
+
+  """All values less than the given value."""
+  id_lt: ID
+
+  """All values less than or equal the given value."""
+  id_lte: ID
+
+  """All values greater than the given value."""
+  id_gt: ID
+
+  """All values greater than or equal the given value."""
+  id_gte: ID
+
+  """All values containing the given string."""
+  id_contains: ID
+
+  """All values not containing the given string."""
+  id_not_contains: ID
+
+  """All values starting with the given string."""
+  id_starts_with: ID
+
+  """All values not starting with the given string."""
+  id_not_starts_with: ID
+
+  """All values ending with the given string."""
+  id_ends_with: ID
+
+  """All values not ending with the given string."""
+  id_not_ends_with: ID
+  email: String
+
+  """All values that are not equal to given value."""
+  email_not: String
+
+  """All values that are contained in given list."""
+  email_in: [String!]
+
+  """All values that are not contained in given list."""
+  email_not_in: [String!]
+
+  """All values less than the given value."""
+  email_lt: String
+
+  """All values less than or equal the given value."""
+  email_lte: String
+
+  """All values greater than the given value."""
+  email_gt: String
+
+  """All values greater than or equal the given value."""
+  email_gte: String
+
+  """All values containing the given string."""
+  email_contains: String
+
+  """All values not containing the given string."""
+  email_not_contains: String
+
+  """All values starting with the given string."""
+  email_starts_with: String
+
+  """All values not starting with the given string."""
+  email_not_starts_with: String
+
+  """All values ending with the given string."""
+  email_ends_with: String
+
+  """All values not ending with the given string."""
+  email_not_ends_with: String
+  firstName: String
+
+  """All values that are not equal to given value."""
+  firstName_not: String
+
+  """All values that are contained in given list."""
+  firstName_in: [String!]
+
+  """All values that are not contained in given list."""
+  firstName_not_in: [String!]
+
+  """All values less than the given value."""
+  firstName_lt: String
+
+  """All values less than or equal the given value."""
+  firstName_lte: String
+
+  """All values greater than the given value."""
+  firstName_gt: String
+
+  """All values greater than or equal the given value."""
+  firstName_gte: String
+
+  """All values containing the given string."""
+  firstName_contains: String
+
+  """All values not containing the given string."""
+  firstName_not_contains: String
+
+  """All values starting with the given string."""
+  firstName_starts_with: String
+
+  """All values not starting with the given string."""
+  firstName_not_starts_with: String
+
+  """All values ending with the given string."""
+  firstName_ends_with: String
+
+  """All values not ending with the given string."""
+  firstName_not_ends_with: String
+  lastName: String
+
+  """All values that are not equal to given value."""
+  lastName_not: String
+
+  """All values that are contained in given list."""
+  lastName_in: [String!]
+
+  """All values that are not contained in given list."""
+  lastName_not_in: [String!]
+
+  """All values less than the given value."""
+  lastName_lt: String
+
+  """All values less than or equal the given value."""
+  lastName_lte: String
+
+  """All values greater than the given value."""
+  lastName_gt: String
+
+  """All values greater than or equal the given value."""
+  lastName_gte: String
+
+  """All values containing the given string."""
+  lastName_contains: String
+
+  """All values not containing the given string."""
+  lastName_not_contains: String
+
+  """All values starting with the given string."""
+  lastName_starts_with: String
+
+  """All values not starting with the given string."""
+  lastName_not_starts_with: String
+
+  """All values ending with the given string."""
+  lastName_ends_with: String
+
+  """All values not ending with the given string."""
+  lastName_not_ends_with: String
+  profilePicture: String
+
+  """All values that are not equal to given value."""
+  profilePicture_not: String
+
+  """All values that are contained in given list."""
+  profilePicture_in: [String!]
+
+  """All values that are not contained in given list."""
+  profilePicture_not_in: [String!]
+
+  """All values less than the given value."""
+  profilePicture_lt: String
+
+  """All values less than or equal the given value."""
+  profilePicture_lte: String
+
+  """All values greater than the given value."""
+  profilePicture_gt: String
+
+  """All values greater than or equal the given value."""
+  profilePicture_gte: String
+
+  """All values containing the given string."""
+  profilePicture_contains: String
+
+  """All values not containing the given string."""
+  profilePicture_not_contains: String
+
+  """All values starting with the given string."""
+  profilePicture_starts_with: String
+
+  """All values not starting with the given string."""
+  profilePicture_not_starts_with: String
+
+  """All values ending with the given string."""
+  profilePicture_ends_with: String
+
+  """All values not ending with the given string."""
+  profilePicture_not_ends_with: String
+  channelDescription: String
+
+  """All values that are not equal to given value."""
+  channelDescription_not: String
+
+  """All values that are contained in given list."""
+  channelDescription_in: [String!]
+
+  """All values that are not contained in given list."""
+  channelDescription_not_in: [String!]
+
+  """All values less than the given value."""
+  channelDescription_lt: String
+
+  """All values less than or equal the given value."""
+  channelDescription_lte: String
+
+  """All values greater than the given value."""
+  channelDescription_gt: String
+
+  """All values greater than or equal the given value."""
+  channelDescription_gte: String
+
+  """All values containing the given string."""
+  channelDescription_contains: String
+
+  """All values not containing the given string."""
+  channelDescription_not_contains: String
+
+  """All values starting with the given string."""
+  channelDescription_starts_with: String
+
+  """All values not starting with the given string."""
+  channelDescription_not_starts_with: String
+
+  """All values ending with the given string."""
+  channelDescription_ends_with: String
+
+  """All values not ending with the given string."""
+  channelDescription_not_ends_with: String
+  isBlocked: Boolean
+
+  """All values that are not equal to given value."""
+  isBlocked_not: Boolean
+  role: Role
+
+  """All values that are not equal to given value."""
+  role_not: Role
+
+  """All values that are contained in given list."""
+  role_in: [Role!]
+
+  """All values that are not contained in given list."""
+  role_not_in: [Role!]
+  subscribers_every: UserWhereInput
+  subscribers_some: UserWhereInput
+  subscribers_none: UserWhereInput
+  uploadedVideos_every: VideoWhereInput
+  uploadedVideos_some: VideoWhereInput
+  uploadedVideos_none: VideoWhereInput
+  commentsPosted_every: CommentWhereInput
+  commentsPosted_some: CommentWhereInput
+  commentsPosted_none: CommentWhereInput
+}
+
+input UserWhereUniqueInput {
+  id: ID
+  email: String
+}
+
+type Video implements Node {
+  id: ID!
+  url: String!
+  title: String!
+  description: String
+  visibility: Visibility!
+  isCommentingAllowed: Boolean!
+  isRatingVisible: Boolean!
+  isBlocked: Boolean
+  views: Int!
+  likes: Int!
+  dislikes: Int!
+  uploader(where: UserWhereInput): User!
+  comments(where: CommentWhereInput, orderBy: CommentOrderByInput, skip: Int, after: String, before: String, first: Int, last: Int): [Comment!]
+}
+
+"""A connection to a list of items."""
+type VideoConnection {
+  """Information to aid in pagination."""
+  pageInfo: PageInfo!
+
+  """A list of edges."""
+  edges: [VideoEdge]!
+  aggregate: AggregateVideo!
+}
+
+input VideoCreateInput {
+  url: String!
+  title: String!
+  description: String
+  visibility: Visibility!
+  isCommentingAllowed: Boolean!
+  isRatingVisible: Boolean!
+  isBlocked: Boolean
+  views: Int!
+  likes: Int!
+  dislikes: Int!
+  uploader: UserCreateOneWithoutUploadedVideosInput!
+  comments: CommentCreateManyWithoutVideoInput
+}
+
+input VideoCreateManyWithoutUploaderInput {
+  create: [VideoCreateWithoutUploaderInput!]
+  connect: [VideoWhereUniqueInput!]
+}
+
+input VideoCreateOneWithoutCommentsInput {
+  create: VideoCreateWithoutCommentsInput
+  connect: VideoWhereUniqueInput
+}
+
+input VideoCreateWithoutCommentsInput {
+  url: String!
+  title: String!
+  description: String
+  visibility: Visibility!
+  isCommentingAllowed: Boolean!
+  isRatingVisible: Boolean!
+  isBlocked: Boolean
+  views: Int!
+  likes: Int!
+  dislikes: Int!
+  uploader: UserCreateOneWithoutUploadedVideosInput!
+}
+
+input VideoCreateWithoutUploaderInput {
+  url: String!
+  title: String!
+  description: String
+  visibility: Visibility!
+  isCommentingAllowed: Boolean!
+  isRatingVisible: Boolean!
+  isBlocked: Boolean
+  views: Int!
+  likes: Int!
+  dislikes: Int!
+  comments: CommentCreateManyWithoutVideoInput
+}
+
+"""An edge in a connection."""
+type VideoEdge {
+  """The item at the end of the edge."""
+  node: Video!
+
+  """A cursor for use in pagination."""
+  cursor: String!
+}
+
+enum VideoOrderByInput {
+  id_ASC
+  id_DESC
+  url_ASC
+  url_DESC
+  title_ASC
+  title_DESC
+  description_ASC
+  description_DESC
+  visibility_ASC
+  visibility_DESC
+  isCommentingAllowed_ASC
+  isCommentingAllowed_DESC
+  isRatingVisible_ASC
+  isRatingVisible_DESC
+  isBlocked_ASC
+  isBlocked_DESC
+  views_ASC
+  views_DESC
+  likes_ASC
+  likes_DESC
+  dislikes_ASC
+  dislikes_DESC
+  updatedAt_ASC
+  updatedAt_DESC
+  createdAt_ASC
+  createdAt_DESC
+}
+
+type VideoPreviousValues {
+  id: ID!
+  url: String!
+  title: String!
+  description: String
+  visibility: Visibility!
+  isCommentingAllowed: Boolean!
+  isRatingVisible: Boolean!
+  isBlocked: Boolean
+  views: Int!
+  likes: Int!
+  dislikes: Int!
+}
+
+type VideoSubscriptionPayload {
+  mutation: MutationType!
+  node: Video
+  updatedFields: [String!]
+  previousValues: VideoPreviousValues
+}
+
+input VideoSubscriptionWhereInput {
+  """Logical AND on all given filters."""
+  AND: [VideoSubscriptionWhereInput!]
+
+  """Logical OR on all given filters."""
+  OR: [VideoSubscriptionWhereInput!]
+
+  """Logical NOT on all given filters combined by AND."""
+  NOT: [VideoSubscriptionWhereInput!]
+
+  """
+  The subscription event gets dispatched when it's listed in mutation_in
+  """
+  mutation_in: [MutationType!]
+
+  """
+  The subscription event gets only dispatched when one of the updated fields names is included in this list
+  """
+  updatedFields_contains: String
+
+  """
+  The subscription event gets only dispatched when all of the field names included in this list have been updated
+  """
+  updatedFields_contains_every: [String!]
+
+  """
+  The subscription event gets only dispatched when some of the field names included in this list have been updated
+  """
+  updatedFields_contains_some: [String!]
+  node: VideoWhereInput
+}
+
+input VideoUpdateInput {
+  url: String
+  title: String
+  description: String
+  visibility: Visibility
+  isCommentingAllowed: Boolean
+  isRatingVisible: Boolean
+  isBlocked: Boolean
+  views: Int
+  likes: Int
+  dislikes: Int
+  uploader: UserUpdateOneWithoutUploadedVideosInput
+  comments: CommentUpdateManyWithoutVideoInput
+}
+
+input VideoUpdateManyWithoutUploaderInput {
+  create: [VideoCreateWithoutUploaderInput!]
+  connect: [VideoWhereUniqueInput!]
+  disconnect: [VideoWhereUniqueInput!]
+  delete: [VideoWhereUniqueInput!]
+  update: [VideoUpdateWithWhereUniqueWithoutUploaderInput!]
+  upsert: [VideoUpsertWithWhereUniqueWithoutUploaderInput!]
+}
+
+input VideoUpdateOneWithoutCommentsInput {
+  create: VideoCreateWithoutCommentsInput
+  connect: VideoWhereUniqueInput
+  delete: Boolean
+  update: VideoUpdateWithoutCommentsDataInput
+  upsert: VideoUpsertWithoutCommentsInput
+}
+
+input VideoUpdateWithoutCommentsDataInput {
+  url: String
+  title: String
+  description: String
+  visibility: Visibility
+  isCommentingAllowed: Boolean
+  isRatingVisible: Boolean
+  isBlocked: Boolean
+  views: Int
+  likes: Int
+  dislikes: Int
+  uploader: UserUpdateOneWithoutUploadedVideosInput
+}
+
+input VideoUpdateWithoutUploaderDataInput {
+  url: String
+  title: String
+  description: String
+  visibility: Visibility
+  isCommentingAllowed: Boolean
+  isRatingVisible: Boolean
+  isBlocked: Boolean
+  views: Int
+  likes: Int
+  dislikes: Int
+  comments: CommentUpdateManyWithoutVideoInput
+}
+
+input VideoUpdateWithWhereUniqueWithoutUploaderInput {
+  where: VideoWhereUniqueInput!
+  data: VideoUpdateWithoutUploaderDataInput!
+}
+
+input VideoUpsertWithoutCommentsInput {
+  update: VideoUpdateWithoutCommentsDataInput!
+  create: VideoCreateWithoutCommentsInput!
+}
+
+input VideoUpsertWithWhereUniqueWithoutUploaderInput {
+  where: VideoWhereUniqueInput!
+  update: VideoUpdateWithoutUploaderDataInput!
+  create: VideoCreateWithoutUploaderInput!
+}
+
+input VideoWhereInput {
+  """Logical AND on all given filters."""
+  AND: [VideoWhereInput!]
+
+  """Logical OR on all given filters."""
+  OR: [VideoWhereInput!]
+
+  """Logical NOT on all given filters combined by AND."""
+  NOT: [VideoWhereInput!]
+  id: ID
+
+  """All values that are not equal to given value."""
+  id_not: ID
+
+  """All values that are contained in given list."""
+  id_in: [ID!]
+
+  """All values that are not contained in given list."""
+  id_not_in: [ID!]
+
+  """All values less than the given value."""
+  id_lt: ID
+
+  """All values less than or equal the given value."""
+  id_lte: ID
+
+  """All values greater than the given value."""
+  id_gt: ID
+
+  """All values greater than or equal the given value."""
+  id_gte: ID
+
+  """All values containing the given string."""
+  id_contains: ID
+
+  """All values not containing the given string."""
+  id_not_contains: ID
+
+  """All values starting with the given string."""
+  id_starts_with: ID
+
+  """All values not starting with the given string."""
+  id_not_starts_with: ID
+
+  """All values ending with the given string."""
+  id_ends_with: ID
+
+  """All values not ending with the given string."""
+  id_not_ends_with: ID
+  url: String
+
+  """All values that are not equal to given value."""
+  url_not: String
+
+  """All values that are contained in given list."""
+  url_in: [String!]
+
+  """All values that are not contained in given list."""
+  url_not_in: [String!]
+
+  """All values less than the given value."""
+  url_lt: String
+
+  """All values less than or equal the given value."""
+  url_lte: String
+
+  """All values greater than the given value."""
+  url_gt: String
+
+  """All values greater than or equal the given value."""
+  url_gte: String
+
+  """All values containing the given string."""
+  url_contains: String
+
+  """All values not containing the given string."""
+  url_not_contains: String
+
+  """All values starting with the given string."""
+  url_starts_with: String
+
+  """All values not starting with the given string."""
+  url_not_starts_with: String
+
+  """All values ending with the given string."""
+  url_ends_with: String
+
+  """All values not ending with the given string."""
+  url_not_ends_with: String
+  title: String
+
+  """All values that are not equal to given value."""
+  title_not: String
+
+  """All values that are contained in given list."""
+  title_in: [String!]
+
+  """All values that are not contained in given list."""
+  title_not_in: [String!]
+
+  """All values less than the given value."""
+  title_lt: String
+
+  """All values less than or equal the given value."""
+  title_lte: String
+
+  """All values greater than the given value."""
+  title_gt: String
+
+  """All values greater than or equal the given value."""
+  title_gte: String
+
+  """All values containing the given string."""
+  title_contains: String
+
+  """All values not containing the given string."""
+  title_not_contains: String
+
+  """All values starting with the given string."""
+  title_starts_with: String
+
+  """All values not starting with the given string."""
+  title_not_starts_with: String
+
+  """All values ending with the given string."""
+  title_ends_with: String
+
+  """All values not ending with the given string."""
+  title_not_ends_with: String
+  description: String
+
+  """All values that are not equal to given value."""
+  description_not: String
+
+  """All values that are contained in given list."""
+  description_in: [String!]
+
+  """All values that are not contained in given list."""
+  description_not_in: [String!]
+
+  """All values less than the given value."""
+  description_lt: String
+
+  """All values less than or equal the given value."""
+  description_lte: String
+
+  """All values greater than the given value."""
+  description_gt: String
+
+  """All values greater than or equal the given value."""
+  description_gte: String
+
+  """All values containing the given string."""
+  description_contains: String
+
+  """All values not containing the given string."""
+  description_not_contains: String
+
+  """All values starting with the given string."""
+  description_starts_with: String
+
+  """All values not starting with the given string."""
+  description_not_starts_with: String
+
+  """All values ending with the given string."""
+  description_ends_with: String
+
+  """All values not ending with the given string."""
+  description_not_ends_with: String
+  visibility: Visibility
+
+  """All values that are not equal to given value."""
+  visibility_not: Visibility
+
+  """All values that are contained in given list."""
+  visibility_in: [Visibility!]
+
+  """All values that are not contained in given list."""
+  visibility_not_in: [Visibility!]
+  isCommentingAllowed: Boolean
+
+  """All values that are not equal to given value."""
+  isCommentingAllowed_not: Boolean
+  isRatingVisible: Boolean
+
+  """All values that are not equal to given value."""
+  isRatingVisible_not: Boolean
+  isBlocked: Boolean
+
+  """All values that are not equal to given value."""
+  isBlocked_not: Boolean
+  views: Int
+
+  """All values that are not equal to given value."""
+  views_not: Int
+
+  """All values that are contained in given list."""
+  views_in: [Int!]
+
+  """All values that are not contained in given list."""
+  views_not_in: [Int!]
+
+  """All values less than the given value."""
+  views_lt: Int
+
+  """All values less than or equal the given value."""
+  views_lte: Int
+
+  """All values greater than the given value."""
+  views_gt: Int
+
+  """All values greater than or equal the given value."""
+  views_gte: Int
+  likes: Int
+
+  """All values that are not equal to given value."""
+  likes_not: Int
+
+  """All values that are contained in given list."""
+  likes_in: [Int!]
+
+  """All values that are not contained in given list."""
+  likes_not_in: [Int!]
+
+  """All values less than the given value."""
+  likes_lt: Int
+
+  """All values less than or equal the given value."""
+  likes_lte: Int
+
+  """All values greater than the given value."""
+  likes_gt: Int
+
+  """All values greater than or equal the given value."""
+  likes_gte: Int
+  dislikes: Int
+
+  """All values that are not equal to given value."""
+  dislikes_not: Int
+
+  """All values that are contained in given list."""
+  dislikes_in: [Int!]
+
+  """All values that are not contained in given list."""
+  dislikes_not_in: [Int!]
+
+  """All values less than the given value."""
+  dislikes_lt: Int
+
+  """All values less than or equal the given value."""
+  dislikes_lte: Int
+
+  """All values greater than the given value."""
+  dislikes_gt: Int
+
+  """All values greater than or equal the given value."""
+  dislikes_gte: Int
+  uploader: UserWhereInput
+  comments_every: CommentWhereInput
+  comments_some: CommentWhereInput
+  comments_none: CommentWhereInput
+}
+
+input VideoWhereUniqueInput {
+  id: ID
+}
+
+enum Visibility {
+  PUBLIC
+  UNLISTED
+  PRIVATE
+}
