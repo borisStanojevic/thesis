@@ -1,3 +1,5 @@
+#SET_ NULL (default) | CASCADE
+
 type User {
   id: ID! @unique
   email: String! @unique
@@ -8,8 +10,9 @@ type User {
   isBlocked: Boolean!
   role: Role
   subscribers: [User!]!
-  uploadedVideos: [Video!]!
+  videosUploaded: [Video!]! @relation(name: "VideoToUser", onDelete: CASCADE)
   commentsPosted: [Comment!]!
+    @relation(name: "CommentToUser", onDelete: CASCADE)
 }
 
 enum Role {
@@ -29,8 +32,15 @@ type Video {
   views: Int!
   likes: Int!
   dislikes: Int!
-  uploader: User!
-  comments: [Comment!]!
+  uploader: User! @relation(name: "VideoToUser", onDelete: SET_NULL)
+  comments: [Comment!]! @relation(name: "CommentToVideo", onDelete: CASCADE)
+}
+
+type VideoVote {
+  id: ID! @unique
+  author: User!
+  video: Video!
+  type: VoteType
 }
 
 enum Visibility {
@@ -42,10 +52,22 @@ enum Visibility {
 type Comment {
   id: ID! @unique
   content: String!
-  author: User!
-  video: Video!
   likes: Int!
   dislikes: Int!
+  video: Video! @relation(name: "CommentToVideo", onDelete: SET_NULL)
+  author: User! @relation(name: "CommentToUser", onDelete: SET_NULL)
+}
+
+type CommentVote {
+  id: ID! @unique
+  author: User!
+  comment: Comment!
+  type: VoteType!
+}
+
+enum VoteType {
+  UPVOTE
+  DOWNVOTE
 }
 
 # type Query {
