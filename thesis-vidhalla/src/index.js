@@ -6,7 +6,7 @@ import User from "./resolvers/User";
 import Mutation from "./resolvers/Mutation";
 import Video from "./resolvers/Video";
 import Comment from "./resolvers/Comment";
-import "./prisma";
+import prisma from "./prisma";
 
 // Type definitions that represents schema
 // 5 scalar types: String, Boolean, Int, Float, ID store single-simple-non-further-breakable-down value
@@ -33,7 +33,8 @@ const server = new GraphQLServer({
   resolvers,
   context: {
     db,
-    pubsup
+    pubsup,
+    prisma
   }
 });
 server.start(() => {

@@ -1,140 +1,85 @@
-import uuid from 'uuid/v4';
+import uuid from "uuid/v4";
 
 const Mutation = {
-    createUser(parent, args, {
-        db
+  async createUser(parent, args, { prisma }, info) {
+    const emailTaken = await prisma.exists.User({ email: args.data.email });
+    if (emailTaken) throw new Error("Email taken");
 
-    }, info) {
-        const isEmailTaken = db.users.some(user => user.email === args.data.email);
-        if (isEmailTaken)
-            throw new Error("Email already taken.");
+    const user = await prisma.mutation.createUser({ data: args.data }, info);
 
-        // const one = {
-        //     name: "BA"
-        // };
+    return user;
+  },
 
-        // const two = {
-        //     populaton: 3000000,
-        //     ...one
-        // };
+  async deleteUser(parent, args, { prisma }, info) {
+    const userExists = await prisma.exists.User({ id: args.id });
+    if (!userExists) throw new Error("User not found");
 
-        const user = {
-            id: uuid(),
-            ...args.data,
-            firstName: "",
-            lastName: "",
-            channelDescription: "No description yet.",
-            isBlocked: false,
-            isDeleted: false,
-            subscribers: []
+    const deletedUser = await prisma.mutation.deleteUser({
+      where: { id: args.id }
+    });
+
+    return deletedUser;
+  },
+
+  async updateUser(parent, args, { prisma }, info) {
+    const updatedUser = await prisma.mutation.updateUser({
+      data: args.data,
+      where: { id: args.id }
+    });
+
+    return updatedUser;
+  },
+
+  async createVideo(parent, args, { prisma }, info) {
+    return prisma.mutation.createVideo(
+      {
+        data: {
+          url: args.data.url,
+          title: args.data.title,
+          uploader: { connect: { id: args.data.uploader } }
         }
-        db.users.push(user);
+      },
+      info
+    );
+  },
 
-        return user;
-    },
+  async deleteVideo(parent, args, { prisma }, info) {
+    return prisma.mutation.deleteVideo({ where: { id: args.id } });
+  },
 
-    deleteUser(parent, args, {
-        db
-    }, info) {
-        const userIndex = db.users.findIndex(user => user.id === args.id);
-        if (userIndex === -1)
-            throw new Error("User does not exist.");
+  async updateVideo(parent, args, { prisma }, info) {
+    return prisma.mutation.updateVideo(
+      { data: args.data, where: { id: args.id } },
+      info
+    );
+  },
 
-        const deletedUsers = db.users.splice(userIndex, 1);
-
-        db.videos = db.videos.filter(video => {
-            const match = video.uploader === args.id;
-            if (match)
-                db.comments = db.comments.filter(comment => comment.video != video.id);
-            return !match;
-        });
-        db.comments = db.comments.filter(comment => comment.author != args.id);
-
-        return deletedUsers[0];
-
-    },
-
-    updateUser(parent, args, {
-        db
-    }, info) {
-        const {
-            id,
-            data
-        } = args;
-        const user = db.users.find(user => user.id === id);
-        if (!user)
-            throw new Error("User not found.");
-        if (typeof data.email === "string") {
-            const isEmailTaken = db.users.some(user => user.email === data.email);
-
-            if (isEmailTaken)
-                throw new Error("Email taken ");
-
-            user.email = data.email;
+  async createComment(parent, args, { prisma }, info) {
+    return prisma.mutation.createComment(
+      {
+        data: {
+          content: args.data.content,
+          author: { connect: { id: args.data.author } },
+          video: { connect: { id: args.data.video } }
         }
-        if (typeof data.firstName === "string")
-            user.firstName = data.firstName;
+      },
+      info
+    );
+  },
 
-        if (typeof data.role !== "undefined")
-            user.role = data.role;
+  async updateComment(parent, args, { prisma }, info) {
+    return prisma.mutation.updateComment(
+      {
+        where: { id: args.id },
+        data: args.data
+      },
+      info
+    );
+  },
 
-        return user;
-
-    },
-
-    // createVideo(parent, args, {db}, info) {
-    //     const uploaderExists = db.users.some(user => user.id === args.uploader);
-    //     if (!uploaderExists)
-    //         throw new Error("Uploader does not exist.");
-    //     //kreiraj video, generisi random ID(uuid) dodaj ga u db.videos i vrati ga
-    // },
-
-    createComment(parent, args, {
-        db,
-        pubsub
-    }, info) {
-        const authorExists = db.users.any(user => user.id === args.author);
-        if (!authorExists)
-            throw new Error("Author does not exist.");
-        const videoExists = db.videos.any(video => video.id === args.video);
-        if (!videoExists)
-            throw new Error("Video does not exist.");
-
-        const comment = {
-            id: uuid(),
-            ...args.data
-        };
-
-        db.comments.push(comment);
-        pubsub.publish(`comment ${args.data.video}`, {
-            comment: {
-                mutation: "CREATED",
-                data: comment
-            }
-        });
-
-        return comment;
-    },
-
-    // deleteComment(parent, args, {
-    //     db,
-    //     pubsub
-    // }, info) {
-    //     const commentIndex = db.comments.findIndex(comment => comment.id === args.id);
-
-    //     if (commentIndex === -1)
-    //         throw new Error("Comment not found");
-
-    //     const [deletedComment] = db.coments.splice(commentIndex, 1);
-    //     pubsub.publish(`comment ${deletedComment.video}`, {
-    //         comment: {
-    //             mutation: "DELETED",
-    //             data: deletedComment
-    //         }
-    //     })
-    // },
-
-    //Isto za updateComment
-}
+  async deleteComment(parent, args, { prisma }, info) {
+    return prisma.mutation.deleteComment({ where: { id: args.id } }, info);
+  }
+};
 
 export default Mutation;

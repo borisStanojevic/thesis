@@ -1,46 +1,64 @@
 const Query = {
-    greeting(parent, args, ctx, info) {
-        if (args.name) return `Hello ${args.name}`;
-        return "Hello unnamed one ;)";
-    },
-    me() {
-        return {
-            id: "123",
-            username: "mitar123",
-            email: "mitar123@grand.rs",
-            firstName: "Mitar",
-            lastName: "Miric",
-            channelDescription: "No description yet."
-        };
-    },
-    users(parent, args, {
-        db
-    }, info) {
-        if (args.query) {
-            return db.users.filter(user =>
-                user.username.toLowerCase().includes(args.query.toLowerCase())
-            );
-        }
-        return [];
-    },
-    videos(parent, args, {
-        db
-    }, info) {
-        if (!args.query) return db.videos;
-        const query = args.query.toLowerCase();
-        return db.videos.filter(video => {
-            video.title.toLowerCase().includes(query);
-        });
-    },
-    comments(parent, args, {
-        db
-    }, info) {
-        if (!args.query) return db.comments;
-        const query = args.query.toLowerCase();
-        return db.comments.filter(comment =>
-            comment.content.toLowerCase().includes(query)
-        );
+  greeting(parent, args, ctx, info) {
+    if (args.name) return `Hello ${args.name}`;
+    return "Hello unnamed one ;)";
+  },
+  me() {
+    return {
+      id: "123",
+      username: "mitar123",
+      email: "mitar123@grand.rs",
+      firstName: "Mitar",
+      lastName: "Miric",
+      channelDescription: "No description yet."
+    };
+  },
+  users(parent, args, { prisma }, info) {
+    const operationArgs = {};
+    if (args.query) {
+      operationArgs.where = {
+        OR: [
+          {
+            name_contains: args.query
+          },
+          {
+            email_contains: args.query
+          }
+        ]
+      };
     }
-}
+
+    return prisma.query.users(operationArgs, info);
+  },
+
+  videos(parent, args, { prisma }, info) {
+    const operationArgs = {};
+    if (args.query) {
+      operationArgs.where = {
+        OR: [
+          {
+            title_contains: args.query
+          },
+          {
+            description_contains: args.query
+          }
+        ]
+      };
+    }
+
+    return prisma.query.videos(operationArgs, info);
+  },
+
+  comments(parent, args, { prisma }, info) {
+    const operationArgs = {};
+    if (args.query) {
+      operationArgs.where = {
+        content_contains: args.query
+      };
+    }
+
+    return prisma.query.comments(operationArgs, info);
+  }
+};
 
 export default Query;

@@ -45,6 +45,8 @@ type Query {
   greeting(name: String): String!
   me: User!
   users(query: String): [User!]!
+  videos(query: String): [Video!]!
+  comments(query: String): [Comment!]!
 }
 
 type Mutation {
