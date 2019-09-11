@@ -45,9 +45,12 @@ type Comment {
 type Query {
   greeting(name: String): String!
   me: User!
+
   users(query: String): [User!]!
   videos(query: String): [Video!]!
   comments(query: String): [Comment!]!
+
+  video(id: ID!): Video!
 }
 
 type Mutation {
@@ -55,13 +58,18 @@ type Mutation {
   deleteUser(id: ID!): User!
   updateUser(data: UpdateUserInput!): User!
   createVideo(url: String!, description: String, uploader: ID!): Video!
-  createComment(content: String!, author: ID!, video: ID!): Comment!
+  createComment(data: CreateCommentInput!): Comment!
 }
 
 type CreateVideoInput {
   url: String!
   title: String!
   description: String
+}
+
+type CreateCommentInput {
+  content: String!
+  video: Video!
 }
 
 type Subscription {

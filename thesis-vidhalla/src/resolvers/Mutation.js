@@ -76,19 +76,32 @@ const Mutation = {
     return prisma.mutation.deleteVideo({ where: { id: args.id } });
   },
 
-  async updateVideo(parent, args, { prisma }, info) {
+  async updateVideo(parent, args, { prisma, request }, info) {
+    const userId = getUserId(request);
+
+    const videoExists = await prisma.exists.Video({
+      id: args.id,
+      uploader: {
+        id: userId
+      }
+    });
+
+    if (!videoExists) throw new Error("Unable to update video");
+
     return prisma.mutation.updateVideo(
       { data: args.data, where: { id: args.id } },
       info
     );
   },
 
-  async createComment(parent, args, { prisma }, info) {
+  async createComment(parent, args, { prisma, request }, info) {
+    const userId = getUserId(request);
+
     return prisma.mutation.createComment(
       {
         data: {
           content: args.data.content,
-          author: { connect: { id: args.data.author } },
+          author: { connect: { id: userId } },
           video: { connect: { id: args.data.video } }
         }
       },
@@ -96,7 +109,15 @@ const Mutation = {
     );
   },
 
-  async updateComment(parent, args, { prisma }, info) {
+  async updateComment(parent, args, { prisma, request }, info) {
+    const userId = getUserId(request);
+
+    const commentExists = await prisma.exists.Comment({
+      id: args.id,
+      author: { id: userId }
+    });
+    if (!commentExists) throw new Error("Unable to update comment");
+
     return prisma.mutation.updateComment(
       {
         where: { id: args.id },
@@ -106,7 +127,15 @@ const Mutation = {
     );
   },
 
-  async deleteComment(parent, args, { prisma }, info) {
+  async deleteComment(parent, args, { prisma, request }, info) {
+    const userId = getUserId(request);
+
+    const commentExists = await prisma.exists.Comment({
+      id: args.id,
+      author: { id: userId }
+    });
+    if (!commentExists) throw new Error("Unable to delete comment");
+
     return prisma.mutation.deleteComment({ where: { id: args.id } }, info);
   }
 };
