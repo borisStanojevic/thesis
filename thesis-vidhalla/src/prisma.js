@@ -3,7 +3,8 @@ import Comment from "./resolvers/Comment";
 
 const prisma = new Prisma({
   typeDefs: "src/generated/prisma.graphql",
-  endpoint: "http://localhost:4466"
+  endpoint: "http://localhost:4466",
+  secret: "pr!5m453cr37"
 });
 
 export default prisma;

@@ -1,7 +1,11 @@
 # source: http://localhost:4466
-# timestamp: Mon Sep 09 2019 02:39:37 GMT+0200 (Central European Summer Time)
+# timestamp: Wed Sep 11 2019 23:49:12 GMT+0200 (Central European Summer Time)
 
 type AggregateComment {
+  count: Int!
+}
+
+type AggregateCommentVote {
   count: Int!
 }
 
@@ -13,6 +17,10 @@ type AggregateVideo {
   count: Int!
 }
 
+type AggregateVideoVote {
+  count: Int!
+}
+
 type BatchPayload {
   """The number of nodes that have been affected by the Batch operation."""
   count: Long!
@@ -21,10 +29,10 @@ type BatchPayload {
 type Comment implements Node {
   id: ID!
   content: String!
-  author(where: UserWhereInput): User!
-  video(where: VideoWhereInput): Video!
   likes: Int!
   dislikes: Int!
+  video(where: VideoWhereInput): Video!
+  author(where: UserWhereInput): User!
 }
 
 """A connection to a list of items."""
@@ -41,8 +49,8 @@ input CommentCreateInput {
   content: String!
   likes: Int!
   dislikes: Int!
-  author: UserCreateOneWithoutCommentsPostedInput!
   video: VideoCreateOneWithoutCommentsInput!
+  author: UserCreateOneWithoutCommentsPostedInput!
 }
 
 input CommentCreateManyWithoutAuthorInput {
@@ -53,6 +61,11 @@ input CommentCreateManyWithoutAuthorInput {
 input CommentCreateManyWithoutVideoInput {
   create: [CommentCreateWithoutVideoInput!]
   connect: [CommentWhereUniqueInput!]
+}
+
+input CommentCreateOneInput {
+  create: CommentCreateInput
+  connect: CommentWhereUniqueInput
 }
 
 input CommentCreateWithoutAuthorInput {
@@ -139,12 +152,20 @@ input CommentSubscriptionWhereInput {
   node: CommentWhereInput
 }
 
+input CommentUpdateDataInput {
+  content: String
+  likes: Int
+  dislikes: Int
+  video: VideoUpdateOneWithoutCommentsInput
+  author: UserUpdateOneWithoutCommentsPostedInput
+}
+
 input CommentUpdateInput {
   content: String
   likes: Int
   dislikes: Int
-  author: UserUpdateOneWithoutCommentsPostedInput
   video: VideoUpdateOneWithoutCommentsInput
+  author: UserUpdateOneWithoutCommentsPostedInput
 }
 
 input CommentUpdateManyWithoutAuthorInput {
@@ -163,6 +184,14 @@ input CommentUpdateManyWithoutVideoInput {
   delete: [CommentWhereUniqueInput!]
   update: [CommentUpdateWithWhereUniqueWithoutVideoInput!]
   upsert: [CommentUpsertWithWhereUniqueWithoutVideoInput!]
+}
+
+input CommentUpdateOneInput {
+  create: CommentCreateInput
+  connect: CommentWhereUniqueInput
+  delete: Boolean
+  update: CommentUpdateDataInput
+  upsert: CommentUpsertNestedInput
 }
 
 input CommentUpdateWithoutAuthorDataInput {
@@ -189,6 +218,11 @@ input CommentUpdateWithWhereUniqueWithoutVideoInput {
   data: CommentUpdateWithoutVideoDataInput!
 }
 
+input CommentUpsertNestedInput {
+  update: CommentUpdateDataInput!
+  create: CommentCreateInput!
+}
+
 input CommentUpsertWithWhereUniqueWithoutAuthorInput {
   where: CommentWhereUniqueInput!
   update: CommentUpdateWithoutAuthorDataInput!
@@ -199,6 +233,166 @@ input CommentUpsertWithWhereUniqueWithoutVideoInput {
   where: CommentWhereUniqueInput!
   update: CommentUpdateWithoutVideoDataInput!
   create: CommentCreateWithoutVideoInput!
+}
+
+type CommentVote implements Node {
+  id: ID!
+  author(where: UserWhereInput): User!
+  comment(where: CommentWhereInput): Comment!
+  type: VoteType!
+}
+
+"""A connection to a list of items."""
+type CommentVoteConnection {
+  """Information to aid in pagination."""
+  pageInfo: PageInfo!
+
+  """A list of edges."""
+  edges: [CommentVoteEdge]!
+  aggregate: AggregateCommentVote!
+}
+
+input CommentVoteCreateInput {
+  type: VoteType!
+  author: UserCreateOneInput!
+  comment: CommentCreateOneInput!
+}
+
+"""An edge in a connection."""
+type CommentVoteEdge {
+  """The item at the end of the edge."""
+  node: CommentVote!
+
+  """A cursor for use in pagination."""
+  cursor: String!
+}
+
+enum CommentVoteOrderByInput {
+  id_ASC
+  id_DESC
+  type_ASC
+  type_DESC
+  updatedAt_ASC
+  updatedAt_DESC
+  createdAt_ASC
+  createdAt_DESC
+}
+
+type CommentVotePreviousValues {
+  id: ID!
+  type: VoteType!
+}
+
+type CommentVoteSubscriptionPayload {
+  mutation: MutationType!
+  node: CommentVote
+  updatedFields: [String!]
+  previousValues: CommentVotePreviousValues
+}
+
+input CommentVoteSubscriptionWhereInput {
+  """Logical AND on all given filters."""
+  AND: [CommentVoteSubscriptionWhereInput!]
+
+  """Logical OR on all given filters."""
+  OR: [CommentVoteSubscriptionWhereInput!]
+
+  """Logical NOT on all given filters combined by AND."""
+  NOT: [CommentVoteSubscriptionWhereInput!]
+
+  """
+  The subscription event gets dispatched when it's listed in mutation_in
+  """
+  mutation_in: [MutationType!]
+
+  """
+  The subscription event gets only dispatched when one of the updated fields names is included in this list
+  """
+  updatedFields_contains: String
+
+  """
+  The subscription event gets only dispatched when all of the field names included in this list have been updated
+  """
+  updatedFields_contains_every: [String!]
+
+  """
+  The subscription event gets only dispatched when some of the field names included in this list have been updated
+  """
+  updatedFields_contains_some: [String!]
+  node: CommentVoteWhereInput
+}
+
+input CommentVoteUpdateInput {
+  type: VoteType
+  author: UserUpdateOneInput
+  comment: CommentUpdateOneInput
+}
+
+input CommentVoteWhereInput {
+  """Logical AND on all given filters."""
+  AND: [CommentVoteWhereInput!]
+
+  """Logical OR on all given filters."""
+  OR: [CommentVoteWhereInput!]
+
+  """Logical NOT on all given filters combined by AND."""
+  NOT: [CommentVoteWhereInput!]
+  id: ID
+
+  """All values that are not equal to given value."""
+  id_not: ID
+
+  """All values that are contained in given list."""
+  id_in: [ID!]
+
+  """All values that are not contained in given list."""
+  id_not_in: [ID!]
+
+  """All values less than the given value."""
+  id_lt: ID
+
+  """All values less than or equal the given value."""
+  id_lte: ID
+
+  """All values greater than the given value."""
+  id_gt: ID
+
+  """All values greater than or equal the given value."""
+  id_gte: ID
+
+  """All values containing the given string."""
+  id_contains: ID
+
+  """All values not containing the given string."""
+  id_not_contains: ID
+
+  """All values starting with the given string."""
+  id_starts_with: ID
+
+  """All values not starting with the given string."""
+  id_not_starts_with: ID
+
+  """All values ending with the given string."""
+  id_ends_with: ID
+
+  """All values not ending with the given string."""
+  id_not_ends_with: ID
+  type: VoteType
+
+  """All values that are not equal to given value."""
+  type_not: VoteType
+
+  """All values that are contained in given list."""
+  type_in: [VoteType!]
+
+  """All values that are not contained in given list."""
+  type_not_in: [VoteType!]
+  author: UserWhereInput
+  comment: CommentWhereInput
+}
+
+input CommentVoteWhereUniqueInput {
+  id: ID
 }
 
 input CommentWhereInput {
@@ -334,8 +528,8 @@ input CommentWhereInput {
 
   """All values greater than or equal the given value."""
   dislikes_gte: Int
-  author: UserWhereInput
   video: VideoWhereInput
+  author: UserWhereInput
 }
 
 input CommentWhereUniqueInput {
@@ -349,24 +543,36 @@ Long can represent values between -(2^63) and 2^63 - 1.
 scalar Long
 
 type Mutation {
+  createVideoVote(data: VideoVoteCreateInput!): VideoVote!
+  createCommentVote(data: CommentVoteCreateInput!): CommentVote!
+  createUser(data: UserCreateInput!): User!
   createVideo(data: VideoCreateInput!): Video!
   createComment(data: CommentCreateInput!): Comment!
-  createUser(data: UserCreateInput!): User!
+  updateVideoVote(data: VideoVoteUpdateInput!, where: VideoVoteWhereUniqueInput!): VideoVote
+  updateCommentVote(data: CommentVoteUpdateInput!, where: CommentVoteWhereUniqueInput!): CommentVote
+  updateUser(data: UserUpdateInput!, where: UserWhereUniqueInput!): User
   updateVideo(data: VideoUpdateInput!, where: VideoWhereUniqueInput!): Video
   updateComment(data: CommentUpdateInput!, where: CommentWhereUniqueInput!): Comment
-  updateUser(data: UserUpdateInput!, where: UserWhereUniqueInput!): User
+  deleteVideoVote(where: VideoVoteWhereUniqueInput!): VideoVote
+  deleteCommentVote(where: CommentVoteWhereUniqueInput!): CommentVote
+  deleteUser(where: UserWhereUniqueInput!): User
   deleteVideo(where: VideoWhereUniqueInput!): Video
   deleteComment(where: CommentWhereUniqueInput!): Comment
-  deleteUser(where: UserWhereUniqueInput!): User
+  upsertVideoVote(where: VideoVoteWhereUniqueInput!, create: VideoVoteCreateInput!, update: VideoVoteUpdateInput!): VideoVote!
+  upsertCommentVote(where: CommentVoteWhereUniqueInput!, create: CommentVoteCreateInput!, update: CommentVoteUpdateInput!): CommentVote!
+  upsertUser(where: UserWhereUniqueInput!, create: UserCreateInput!, update: UserUpdateInput!): User!
   upsertVideo(where: VideoWhereUniqueInput!, create: VideoCreateInput!, update: VideoUpdateInput!): Video!
   upsertComment(where: CommentWhereUniqueInput!, create: CommentCreateInput!, update: CommentUpdateInput!): Comment!
-  upsertUser(where: UserWhereUniqueInput!, create: UserCreateInput!, update: UserUpdateInput!): User!
+  updateManyVideoVotes(data: VideoVoteUpdateInput!, where: VideoVoteWhereInput): BatchPayload!
+  updateManyCommentVotes(data: CommentVoteUpdateInput!, where: CommentVoteWhereInput): BatchPayload!
+  updateManyUsers(data: UserUpdateInput!, where: UserWhereInput): BatchPayload!
   updateManyVideos(data: VideoUpdateInput!, where: VideoWhereInput): BatchPayload!
   updateManyComments(data: CommentUpdateInput!, where: CommentWhereInput): BatchPayload!
-  updateManyUsers(data: UserUpdateInput!, where: UserWhereInput): BatchPayload!
+  deleteManyVideoVotes(where: VideoVoteWhereInput): BatchPayload!
+  deleteManyCommentVotes(where: CommentVoteWhereInput): BatchPayload!
+  deleteManyUsers(where: UserWhereInput): BatchPayload!
   deleteManyVideos(where: VideoWhereInput): BatchPayload!
   deleteManyComments(where: CommentWhereInput): BatchPayload!
-  deleteManyUsers(where: UserWhereInput): BatchPayload!
 }
 
 enum MutationType {
@@ -397,15 +603,21 @@ type PageInfo {
 }
 
 type Query {
+  videoVotes(where: VideoVoteWhereInput, orderBy: VideoVoteOrderByInput, skip: Int, after: String, before: String, first: Int, last: Int): [VideoVote]!
+  commentVotes(where: CommentVoteWhereInput, orderBy: CommentVoteOrderByInput, skip: Int, after: String, before: String, first: Int, last: Int): [CommentVote]!
+  users(where: UserWhereInput, orderBy: UserOrderByInput, skip: Int, after: String, before: String, first: Int, last: Int): [User]!
   videos(where: VideoWhereInput, orderBy: VideoOrderByInput, skip: Int, after: String, before: String, first: Int, last: Int): [Video]!
   comments(where: CommentWhereInput, orderBy: CommentOrderByInput, skip: Int, after: String, before: String, first: Int, last: Int): [Comment]!
-  users(where: UserWhereInput, orderBy: UserOrderByInput, skip: Int, after: String, before: String, first: Int, last: Int): [User]!
+  videoVote(where: VideoVoteWhereUniqueInput!): VideoVote
+  commentVote(where: CommentVoteWhereUniqueInput!): CommentVote
+  user(where: UserWhereUniqueInput!): User
   video(where: VideoWhereUniqueInput!): Video
   comment(where: CommentWhereUniqueInput!): Comment
-  user(where: UserWhereUniqueInput!): User
+  videoVotesConnection(where: VideoVoteWhereInput, orderBy: VideoVoteOrderByInput, skip: Int, after: String, before: String, first: Int, last: Int): VideoVoteConnection!
+  commentVotesConnection(where: CommentVoteWhereInput, orderBy: CommentVoteOrderByInput, skip: Int, after: String, before: String, first: Int, last: Int): CommentVoteConnection!
+  usersConnection(where: UserWhereInput, orderBy: UserOrderByInput, skip: Int, after: String, before: String, first: Int, last: Int): UserConnection!
   videosConnection(where: VideoWhereInput, orderBy: VideoOrderByInput, skip: Int, after: String, before: String, first: Int, last: Int): VideoConnection!
   commentsConnection(where: CommentWhereInput, orderBy: CommentOrderByInput, skip: Int, after: String, before: String, first: Int, last: Int): CommentConnection!
-  usersConnection(where: UserWhereInput, orderBy: UserOrderByInput, skip: Int, after: String, before: String, first: Int, last: Int): UserConnection!
 
   """Fetches an object given its ID"""
   node(
@@ -420,14 +632,17 @@ enum Role {
 }
 
 type Subscription {
+  videoVote(where: VideoVoteSubscriptionWhereInput): VideoVoteSubscriptionPayload
+  commentVote(where: CommentVoteSubscriptionWhereInput): CommentVoteSubscriptionPayload
+  user(where: UserSubscriptionWhereInput): UserSubscriptionPayload
   video(where: VideoSubscriptionWhereInput): VideoSubscriptionPayload
   comment(where: CommentSubscriptionWhereInput): CommentSubscriptionPayload
-  user(where: UserSubscriptionWhereInput): UserSubscriptionPayload
 }
 
 type User implements Node {
   id: ID!
   email: String!
+  password: String!
   firstName: String
   lastName: String
   profilePicture: String!
@@ -435,7 +650,7 @@ type User implements Node {
   isBlocked: Boolean!
   role: Role
   subscribers(where: UserWhereInput, orderBy: UserOrderByInput, skip: Int, after: String, before: String, first: Int, last: Int): [User!]
-  uploadedVideos(where: VideoWhereInput, orderBy: VideoOrderByInput, skip: Int, after: String, before: String, first: Int, last: Int): [Video!]
+  videosUploaded(where: VideoWhereInput, orderBy: VideoOrderByInput, skip: Int, after: String, before: String, first: Int, last: Int): [Video!]
   commentsPosted(where: CommentWhereInput, orderBy: CommentOrderByInput, skip: Int, after: String, before: String, first: Int, last: Int): [Comment!]
 }
 
@@ -451,6 +666,7 @@ type UserConnection {
 
 input UserCreateInput {
   email: String!
+  password: String!
   firstName: String
   lastName: String
   profilePicture: String!
@@ -458,7 +674,7 @@ input UserCreateInput {
   isBlocked: Boolean!
   role: Role
   subscribers: UserCreateManyInput
-  uploadedVideos: VideoCreateManyWithoutUploaderInput
+  videosUploaded: VideoCreateManyWithoutUploaderInput
   commentsPosted: CommentCreateManyWithoutAuthorInput
 }
 
@@ -467,18 +683,24 @@ input UserCreateManyInput {
   connect: [UserWhereUniqueInput!]
 }
 
+input UserCreateOneInput {
+  create: UserCreateInput
+  connect: UserWhereUniqueInput
+}
+
 input UserCreateOneWithoutCommentsPostedInput {
   create: UserCreateWithoutCommentsPostedInput
   connect: UserWhereUniqueInput
 }
 
-input UserCreateOneWithoutUploadedVideosInput {
-  create: UserCreateWithoutUploadedVideosInput
+input UserCreateOneWithoutVideosUploadedInput {
+  create: UserCreateWithoutVideosUploadedInput
   connect: UserWhereUniqueInput
 }
 
 input UserCreateWithoutCommentsPostedInput {
   email: String!
+  password: String!
   firstName: String
   lastName: String
   profilePicture: String!
@@ -486,11 +708,12 @@ input UserCreateWithoutCommentsPostedInput {
   isBlocked: Boolean!
   role: Role
   subscribers: UserCreateManyInput
-  uploadedVideos: VideoCreateManyWithoutUploaderInput
+  videosUploaded: VideoCreateManyWithoutUploaderInput
 }
 
-input UserCreateWithoutUploadedVideosInput {
+input UserCreateWithoutVideosUploadedInput {
   email: String!
+  password: String!
   firstName: String
   lastName: String
   profilePicture: String!
@@ -515,6 +738,8 @@ enum UserOrderByInput {
   id_DESC
   email_ASC
   email_DESC
+  password_ASC
+  password_DESC
   firstName_ASC
   firstName_DESC
   lastName_ASC
@@ -536,6 +761,7 @@ enum UserOrderByInput {
 type UserPreviousValues {
   id: ID!
   email: String!
+  password: String!
   firstName: String
   lastName: String
   profilePicture: String!
@@ -585,6 +811,7 @@ input UserSubscriptionWhereInput {
 
 input UserUpdateDataInput {
   email: String
+  password: String
   firstName: String
   lastName: String
   profilePicture: String
@@ -592,12 +819,13 @@ input UserUpdateDataInput {
   isBlocked: Boolean
   role: Role
   subscribers: UserUpdateManyInput
-  uploadedVideos: VideoUpdateManyWithoutUploaderInput
+  videosUploaded: VideoUpdateManyWithoutUploaderInput
   commentsPosted: CommentUpdateManyWithoutAuthorInput
 }
 
 input UserUpdateInput {
   email: String
+  password: String
   firstName: String
   lastName: String
   profilePicture: String
@@ -605,7 +833,7 @@ input UserUpdateInput {
   isBlocked: Boolean
   role: Role
   subscribers: UserUpdateManyInput
-  uploadedVideos: VideoUpdateManyWithoutUploaderInput
+  videosUploaded: VideoUpdateManyWithoutUploaderInput
   commentsPosted: CommentUpdateManyWithoutAuthorInput
 }
 
@@ -618,6 +846,14 @@ input UserUpdateManyInput {
   upsert: [UserUpsertWithWhereUniqueNestedInput!]
 }
 
+input UserUpdateOneInput {
+  create: UserCreateInput
+  connect: UserWhereUniqueInput
+  delete: Boolean
+  update: UserUpdateDataInput
+  upsert: UserUpsertNestedInput
+}
+
 input UserUpdateOneWithoutCommentsPostedInput {
   create: UserCreateWithoutCommentsPostedInput
   connect: UserWhereUniqueInput
@@ -626,16 +862,17 @@ input UserUpdateOneWithoutCommentsPostedInput {
   upsert: UserUpsertWithoutCommentsPostedInput
 }
 
-input UserUpdateOneWithoutUploadedVideosInput {
-  create: UserCreateWithoutUploadedVideosInput
+input UserUpdateOneWithoutVideosUploadedInput {
+  create: UserCreateWithoutVideosUploadedInput
   connect: UserWhereUniqueInput
   delete: Boolean
-  update: UserUpdateWithoutUploadedVideosDataInput
-  upsert: UserUpsertWithoutUploadedVideosInput
+  update: UserUpdateWithoutVideosUploadedDataInput
+  upsert: UserUpsertWithoutVideosUploadedInput
 }
 
 input UserUpdateWithoutCommentsPostedDataInput {
   email: String
+  password: String
   firstName: String
   lastName: String
   profilePicture: String
@@ -643,11 +880,12 @@ input UserUpdateWithoutCommentsPostedDataInput {
   isBlocked: Boolean
   role: Role
   subscribers: UserUpdateManyInput
-  uploadedVideos: VideoUpdateManyWithoutUploaderInput
+  videosUploaded: VideoUpdateManyWithoutUploaderInput
 }
 
-input UserUpdateWithoutUploadedVideosDataInput {
+input UserUpdateWithoutVideosUploadedDataInput {
   email: String
+  password: String
   firstName: String
   lastName: String
   profilePicture: String
@@ -663,14 +901,19 @@ input UserUpdateWithWhereUniqueNestedInput {
   data: UserUpdateDataInput!
 }
 
+input UserUpsertNestedInput {
+  update: UserUpdateDataInput!
+  create: UserCreateInput!
+}
+
 input UserUpsertWithoutCommentsPostedInput {
   update: UserUpdateWithoutCommentsPostedDataInput!
   create: UserCreateWithoutCommentsPostedInput!
 }
 
-input UserUpsertWithoutUploadedVideosInput {
-  update: UserUpdateWithoutUploadedVideosDataInput!
-  create: UserCreateWithoutUploadedVideosInput!
+input UserUpsertWithoutVideosUploadedInput {
+  update: UserUpdateWithoutVideosUploadedDataInput!
+  create: UserCreateWithoutVideosUploadedInput!
 }
 
 input UserUpsertWithWhereUniqueNestedInput {
@@ -768,6 +1011,46 @@ input UserWhereInput {
 
   """All values not ending with the given string."""
   email_not_ends_with: String
+  password: String
+
+  """All values that are not equal to given value."""
+  password_not: String
+
+  """All values that are contained in given list."""
+  password_in: [String!]
+
+  """All values that are not contained in given list."""
+  password_not_in: [String!]
+
+  """All values less than the given value."""
+  password_lt: String
+
+  """All values less than or equal the given value."""
+  password_lte: String
+
+  """All values greater than the given value."""
+  password_gt: String
+
+  """All values greater than or equal the given value."""
+  password_gte: String
+
+  """All values containing the given string."""
+  password_contains: String
+
+  """All values not containing the given string."""
+  password_not_contains: String
+
+  """All values starting with the given string."""
+  password_starts_with: String
+
+  """All values not starting with the given string."""
+  password_not_starts_with: String
+
+  """All values ending with the given string."""
+  password_ends_with: String
+
+  """All values not ending with the given string."""
+  password_not_ends_with: String
   firstName: String
 
   """All values that are not equal to given value."""
@@ -945,9 +1228,9 @@ input UserWhereInput {
   subscribers_every: UserWhereInput
   subscribers_some: UserWhereInput
   subscribers_none: UserWhereInput
-  uploadedVideos_every: VideoWhereInput
-  uploadedVideos_some: VideoWhereInput
-  uploadedVideos_none: VideoWhereInput
+  videosUploaded_every: VideoWhereInput
+  videosUploaded_some: VideoWhereInput
+  videosUploaded_none: VideoWhereInput
   commentsPosted_every: CommentWhereInput
   commentsPosted_some: CommentWhereInput
   commentsPosted_none: CommentWhereInput
@@ -995,13 +1278,18 @@ input VideoCreateInput {
   views: Int!
   likes: Int!
   dislikes: Int!
-  uploader: UserCreateOneWithoutUploadedVideosInput!
+  uploader: UserCreateOneWithoutVideosUploadedInput!
   comments: CommentCreateManyWithoutVideoInput
 }
 
 input VideoCreateManyWithoutUploaderInput {
   create: [VideoCreateWithoutUploaderInput!]
   connect: [VideoWhereUniqueInput!]
+}
+
+input VideoCreateOneInput {
+  create: VideoCreateInput
+  connect: VideoWhereUniqueInput
 }
 
 input VideoCreateOneWithoutCommentsInput {
@@ -1020,7 +1308,7 @@ input VideoCreateWithoutCommentsInput {
   views: Int!
   likes: Int!
   dislikes: Int!
-  uploader: UserCreateOneWithoutUploadedVideosInput!
+  uploader: UserCreateOneWithoutVideosUploadedInput!
 }
 
 input VideoCreateWithoutUploaderInput {
@@ -1128,6 +1416,21 @@ input VideoSubscriptionWhereInput {
   node: VideoWhereInput
 }
 
+input VideoUpdateDataInput {
+  url: String
+  title: String
+  description: String
+  visibility: Visibility
+  isCommentingAllowed: Boolean
+  isRatingVisible: Boolean
+  isBlocked: Boolean
+  views: Int
+  likes: Int
+  dislikes: Int
+  uploader: UserUpdateOneWithoutVideosUploadedInput
+  comments: CommentUpdateManyWithoutVideoInput
+}
+
 input VideoUpdateInput {
   url: String
   title: String
@@ -1139,7 +1442,7 @@ input VideoUpdateInput {
   views: Int
   likes: Int
   dislikes: Int
-  uploader: UserUpdateOneWithoutUploadedVideosInput
+  uploader: UserUpdateOneWithoutVideosUploadedInput
   comments: CommentUpdateManyWithoutVideoInput
 }
 
@@ -1150,6 +1453,14 @@ input VideoUpdateManyWithoutUploaderInput {
   delete: [VideoWhereUniqueInput!]
   update: [VideoUpdateWithWhereUniqueWithoutUploaderInput!]
   upsert: [VideoUpsertWithWhereUniqueWithoutUploaderInput!]
+}
+
+input VideoUpdateOneInput {
+  create: VideoCreateInput
+  connect: VideoWhereUniqueInput
+  delete: Boolean
+  update: VideoUpdateDataInput
+  upsert: VideoUpsertNestedInput
 }
 
 input VideoUpdateOneWithoutCommentsInput {
@@ -1171,7 +1482,7 @@ input VideoUpdateWithoutCommentsDataInput {
   views: Int
   likes: Int
   dislikes: Int
-  uploader: UserUpdateOneWithoutUploadedVideosInput
+  uploader: UserUpdateOneWithoutVideosUploadedInput
 }
 
 input VideoUpdateWithoutUploaderDataInput {
@@ -1193,6 +1504,11 @@ input VideoUpdateWithWhereUniqueWithoutUploaderInput {
   data: VideoUpdateWithoutUploaderDataInput!
 }
 
+input VideoUpsertNestedInput {
+  update: VideoUpdateDataInput!
+  create: VideoCreateInput!
+}
+
 input VideoUpsertWithoutCommentsInput {
   update: VideoUpdateWithoutCommentsDataInput!
   create: VideoCreateWithoutCommentsInput!
@@ -1202,6 +1518,166 @@ input VideoUpsertWithWhereUniqueWithoutUploaderInput {
   where: VideoWhereUniqueInput!
   update: VideoUpdateWithoutUploaderDataInput!
   create: VideoCreateWithoutUploaderInput!
+}
+
+type VideoVote implements Node {
+  id: ID!
+  author(where: UserWhereInput): User!
+  video(where: VideoWhereInput): Video!
+  type: VoteType
+}
+
+"""A connection to a list of items."""
+type VideoVoteConnection {
+  """Information to aid in pagination."""
+  pageInfo: PageInfo!
+
+  """A list of edges."""
+  edges: [VideoVoteEdge]!
+  aggregate: AggregateVideoVote!
+}
+
+input VideoVoteCreateInput {
+  type: VoteType
+  author: UserCreateOneInput!
+  video: VideoCreateOneInput!
+}
+
+"""An edge in a connection."""
+type VideoVoteEdge {
+  """The item at the end of the edge."""
+  node: VideoVote!
+
+  """A cursor for use in pagination."""
+  cursor: String!
+}
+
+enum VideoVoteOrderByInput {
+  id_ASC
+  id_DESC
+  type_ASC
+  type_DESC
+  updatedAt_ASC
+  updatedAt_DESC
+  createdAt_ASC
+  createdAt_DESC
+}
+
+type VideoVotePreviousValues {
+  id: ID!
+  type: VoteType
+}
+
+type VideoVoteSubscriptionPayload {
+  mutation: MutationType!
+  node: VideoVote
+  updatedFields: [String!]
+  previousValues: VideoVotePreviousValues
+}
+
+input VideoVoteSubscriptionWhereInput {
+  """Logical AND on all given filters."""
+  AND: [VideoVoteSubscriptionWhereInput!]
+
+  """Logical OR on all given filters."""
+  OR: [VideoVoteSubscriptionWhereInput!]
+
+  """Logical NOT on all given filters combined by AND."""
+  NOT: [VideoVoteSubscriptionWhereInput!]
+
+  """
+  The subscription event gets dispatched when it's listed in mutation_in
+  """
+  mutation_in: [MutationType!]
+
+  """
+  The subscription event gets only dispatched when one of the updated fields names is included in this list
+  """
+  updatedFields_contains: String
+
+  """
+  The subscription event gets only dispatched when all of the field names included in this list have been updated
+  """
+  updatedFields_contains_every: [String!]
+
+  """
+  The subscription event gets only dispatched when some of the field names included in this list have been updated
+  """
+  updatedFields_contains_some: [String!]
+  node: VideoVoteWhereInput
+}
+
+input VideoVoteUpdateInput {
+  type: VoteType
+  author: UserUpdateOneInput
+  video: VideoUpdateOneInput
+}
+
+input VideoVoteWhereInput {
+  """Logical AND on all given filters."""
+  AND: [VideoVoteWhereInput!]
+
+  """Logical OR on all given filters."""
+  OR: [VideoVoteWhereInput!]
+
+  """Logical NOT on all given filters combined by AND."""
+  NOT: [VideoVoteWhereInput!]
+  id: ID
+
+  """All values that are not equal to given value."""
+  id_not: ID
+
+  """All values that are contained in given list."""
+  id_in: [ID!]
+
+  """All values that are not contained in given list."""
+  id_not_in: [ID!]
+
+  """All values less than the given value."""
+  id_lt: ID
+
+  """All values less than or equal the given value."""
+  id_lte: ID
+
+  """All values greater than the given value."""
+  id_gt: ID
+
+  """All values greater than or equal the given value."""
+  id_gte: ID
+
+  """All values containing the given string."""
+  id_contains: ID
+
+  """All values not containing the given string."""
+  id_not_contains: ID
+
+  """All values starting with the given string."""
+  id_starts_with: ID
+
+  """All values not starting with the given string."""
+  id_not_starts_with: ID
+
+  """All values ending with the given string."""
+  id_ends_with: ID
+
+  """All values not ending with the given string."""
+  id_not_ends_with: ID
+  type: VoteType
+
+  """All values that are not equal to given value."""
+  type_not: VoteType
+
+  """All values that are contained in given list."""
+  type_in: [VoteType!]
+
+  """All values that are not contained in given list."""
+  type_not_in: [VoteType!]
+  author: UserWhereInput
+  video: VideoWhereInput
+}
+
+input VideoVoteWhereUniqueInput {
+  id: ID
 }
 
 input VideoWhereInput {
@@ -1475,4 +1951,9 @@ enum Visibility {
   PUBLIC
   UNLISTED
   PRIVATE
+}
+
+enum VoteType {
+  UPVOTE
+  DOWNVOTE
 }

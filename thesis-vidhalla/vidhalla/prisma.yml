@@ -1,2 +1,4 @@
 endpoint: http://localhost:4466
 datamodel: datamodel.graphql
+#Da bi zatvorili prismu za spoljasni svijet, dodajemo joj prisma secret
+secret: pr!5m453cr37

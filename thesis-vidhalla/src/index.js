@@ -31,10 +31,12 @@ const pubsup = new PubSub();
 const server = new GraphQLServer({
   typeDefs: "./src/schema.graphql",
   resolvers,
-  context: {
-    db,
-    pubsup,
-    prisma
+  context(request) {
+    return {
+      db,
+      pubsup,
+      prisma
+    };
   }
 });
 server.start(() => {

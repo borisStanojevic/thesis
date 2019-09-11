@@ -2,6 +2,7 @@ type User {
   id: ID!
   username: String!
   email: String!
+  password: String!
   firstName: String
   lastName: String
   channelDescription: String
@@ -50,15 +51,26 @@ type Query {
 }
 
 type Mutation {
-  createUser(data: CreateUserInput!): User!
+  createUser(data: CreateUserInput!): AuthPayload!
   deleteUser(id: ID!): User!
-  updateUser(id: ID!, data: UpdateUserInput!): User!
+  updateUser(data: UpdateUserInput!): User!
   createVideo(url: String!, description: String, uploader: ID!): Video!
   createComment(content: String!, author: ID!, video: ID!): Comment!
 }
 
+type CreateVideoInput {
+  url: String!
+  title: String!
+  description: String
+}
+
 type Subscription {
   comment(videoId: ID!): CommentSubscriptionPayload!
+}
+
+type AuthPayload {
+  user: User!
+  token: String!
 }
 
 enum MutationType {
@@ -69,12 +81,13 @@ enum MutationType {
 
 type CommentSubscriptionPayload {
   mutation: MutationType!
-  data: Comment!
+  node: Comment
 }
 
 input CreateUserInput {
   username: String!
   email: String!
+  password: String!
   role: Role
 }
 

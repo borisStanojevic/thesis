@@ -3,6 +3,7 @@
 type User {
   id: ID! @unique
   email: String! @unique
+  password: String!
   firstName: String
   lastName: String
   profilePicture: String!
