@@ -13,10 +13,7 @@ const getUserId = (request, requireAuth = true) => {
     throw new Error("Authentication required");
   }
 
-  const token = authorizationHeader.replace("Bearer ", "");
-  const decodedToken = jwt.verify(token, "s3cr37");
-
-  return decodedToken.userId;
+  return null;
 };
 
 export default getUserId;

@@ -1,11 +1,7 @@
 import { GraphQLServer, PubSub } from "graphql-yoga";
 import uuid from "uuid/v4";
 import db from "./db";
-import Query from "./resolvers/Query";
-import User from "./resolvers/User";
-import Mutation from "./resolvers/Mutation";
-import Video from "./resolvers/Video";
-import Comment from "./resolvers/Comment";
+import { resolvers, fragmentReplacements } from "./resolvers/index";
 import prisma from "./prisma";
 
 // Type definitions that represents schema
@@ -17,13 +13,6 @@ import prisma from "./prisma";
 // args - Contains all of the argument values provided
 // {db}
 // info
-const resolvers = {
-  Query,
-  Mutation,
-  User,
-  Video,
-  Comment
-};
 
 const pubsup = new PubSub();
 
@@ -37,8 +26,10 @@ const server = new GraphQLServer({
       pubsup,
       prisma
     };
-  }
+  },
+  fragmentReplacements
 });
+
 server.start(() => {
   console.log("Server running...");
 });

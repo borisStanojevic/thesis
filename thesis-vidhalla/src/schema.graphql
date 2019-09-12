@@ -1,7 +1,7 @@
 type User {
   id: ID!
   username: String!
-  email: String!
+  email: String
   password: String!
   firstName: String
   lastName: String
@@ -48,6 +48,7 @@ type Query {
 
   users(query: String): [User!]!
   videos(query: String): [Video!]!
+  myVideos(query: String): [Video!]!
   comments(query: String): [Comment!]!
 
   video(id: ID!): Video!
@@ -100,7 +101,9 @@ input CreateUserInput {
 }
 
 input UpdateUserInput {
-  email: String
-  role: Role
   firstName: String
+  lastName: String
+  email: String
+  password: String
+  role: Role
 }

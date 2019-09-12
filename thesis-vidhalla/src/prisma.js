@@ -1,10 +1,12 @@
 import { Prisma } from "prisma-binding";
 import Comment from "./resolvers/Comment";
+import { fragmentReplacements } from "./resolvers/index";
 
 const prisma = new Prisma({
   typeDefs: "src/generated/prisma.graphql",
   endpoint: "http://localhost:4466",
-  secret: "pr!5m453cr37"
+  secret: "pr!5m453cr37 ",
+  fragmentReplacements
 });
 
 export default prisma;

@@ -1,29 +1,43 @@
-import bcrypt from "bcryptjs";
-import jwt from "jsonwebtoken";
 import getUserId from "./../utils/getUserId";
+import generateJwt from "../utils/generateJWT";
+import hashPassword from "./../utils/hashPassword";
 
 // const token = jwt.sign({ id: 99 }, "secret");
 // const decoded = jwt.decode(token); // Decoded payload
 // jwt.verify(token, secret);
 
 const Mutation = {
+  async login(parent, args, { prisma }, info) {
+    const user = await prisma.query.users({
+      where: {
+        email: args.data.email
+      }
+    });
+
+    if (!user) throw new Error("Invalid email");
+
+    const passwordMatches = await bcrypt.compare(
+      args.data.password,
+      user.password
+    );
+
+    if (!passwordMatches) throw new Error("Invalid password");
+
+    return { user, token: generateJwt(user.id) };
+  },
+
   async createUser(parent, args, { prisma }, info) {
     //Take in password > validate password > hash password > generate auth token(JWT)
-
-    if (args.data.password.length < 8)
-      throw new Error("Password must be at least 8 characters long");
-
     const emailTaken = await prisma.exists.User({ email: args.data.email });
     if (emailTaken) throw new Error("Email taken");
-    //Now we have to store hashed password inside db but our data model accepts regular
-    //What we do is we override password with hashed password. cool stuff
-    const hashedPassword = await bcrypt.hash(args.data.password, 10);
+
+    const hashedPassword = hashPassword(args.data.password);
+
     const user = await prisma.mutation.createUser({
       data: { ...args.data, password: hashedPassword }
     });
-    const token = jwt.sign({ userId: user.id }, "s3cr37");
 
-    return { user, token };
+    return { user, token: generateJwt(user.id) };
   },
 
   async deleteUser(parent, args, { prisma, request }, info) {
@@ -41,9 +55,12 @@ const Mutation = {
   async updateUser(parent, args, { prisma, request }, info) {
     const userId = getUserId(request);
 
+    if (typeof args.data.password === "string")
+      args.data.password = await hashPassword(args.data.password);
+
     const updatedUser = await prisma.mutation.updateUser({
-      data: args.data,
-      where: { id: userId }
+      where: { id: userId },
+      data: args.data
     });
 
     return updatedUser;
@@ -96,6 +113,12 @@ const Mutation = {
 
   async createComment(parent, args, { prisma, request }, info) {
     const userId = getUserId(request);
+    const videoExists = await prisma.exists.Video({
+      id: args.data.video,
+      isBlocked: false
+    });
+
+    if (!videoExists) throw new Error("Unable to find video");
 
     return prisma.mutation.createComment(
       {
