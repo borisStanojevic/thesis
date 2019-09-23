@@ -1,5 +1,4 @@
 import { Prisma } from "prisma-binding";
-import Comment from "./resolvers/Comment";
 import { fragmentReplacements } from "./resolvers/index";
 
 const prisma = new Prisma({

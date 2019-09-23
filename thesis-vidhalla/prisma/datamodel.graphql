@@ -6,10 +6,12 @@ type User {
   password: String!
   firstName: String
   lastName: String
-  profilePicture: String!
+  profilePicture: String! @default(value: "default.png")
   channelDescription: String
   isBlocked: Boolean!
-  role: Role
+  isDeleted: Boolean!
+  role: Role!
+  registrationDate: DateTime!
   subscribers: [User!]!
   videosUploaded: [Video!]! @relation(name: "VideoToUser", onDelete: CASCADE)
   commentsPosted: [Comment!]!
@@ -27,9 +29,11 @@ type Video {
   title: String!
   description: String
   visibility: Visibility!
-  isCommentingAllowed: Boolean!
-  isRatingVisible: Boolean!
-  isBlocked: Boolean
+  isCommentingAllowed: Boolean! @default(value: "true")
+  isRatingVisible: Boolean! @default(value: "true")
+  isBlocked: Boolean!
+  isDeleted: Boolean!
+  dateUploaded: DateTime!
   views: Int!
   likes: Int!
   dislikes: Int!
@@ -41,6 +45,7 @@ type VideoVote {
   id: ID! @unique
   author: User!
   video: Video!
+  dateCreated: DateTime!
   type: VoteType
 }
 
@@ -55,6 +60,8 @@ type Comment {
   content: String!
   likes: Int!
   dislikes: Int!
+  isDeleted: Boolean!
+  datePosted: DateTime!
   video: Video! @relation(name: "CommentToVideo", onDelete: SET_NULL)
   author: User! @relation(name: "CommentToUser", onDelete: SET_NULL)
 }
@@ -63,6 +70,7 @@ type CommentVote {
   id: ID! @unique
   author: User!
   comment: Comment!
+  dateCreated: DateTime!
   type: VoteType!
 }
 
@@ -70,44 +78,3 @@ enum VoteType {
   UPVOTE
   DOWNVOTE
 }
-
-# type Query {
-#   greeting(name: String): String!
-#   me: User!
-#   users(query: String): [User!]!
-# }
-
-# type Mutation {
-#   createUser(data: CreateUserInput!): User!
-#   deleteUser(id: ID!): User!
-#   updateUser(id: ID!, data: UpdateUserInput!): User!
-#   createVideo(url: String!, description: String, uploader: ID!): Video!
-#   createComment(content: String!, author: ID!, video: ID!): Comment!
-# }
-
-# type Subscription {
-#   comment(videoId: ID!): CommentSubscriptionPayload!
-# }
-
-# enum MutationType {
-#   CREATED
-#   UPDATED
-#   DELETED
-# }
-
-# type CommentSubscriptionPayload {
-#   mutation: MutationType!
-#   data: Comment!
-# }
-
-# input CreateUserInput {
-#   username: String!
-#   email: String!
-#   role: Role
-# }
-
-# input UpdateUserInput {
-#   email: String
-#   role: Role
-#   firstName: String
-# }

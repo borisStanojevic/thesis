@@ -13,7 +13,7 @@ const User = {
 
   email: {
     fragment: "fragment userId on User { id }",
-    resolve(parent, args, { request, prisma }, info) {
+    resolve(parent, args, { request }, info) {
       const authenticatedUserId = getUserId(request, false);
       if (authenticatedUserId && authenticatedUserId === parent.id)
         return parent.email;

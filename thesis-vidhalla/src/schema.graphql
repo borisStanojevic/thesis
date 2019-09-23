@@ -2,13 +2,13 @@ type User {
   id: ID!
   username: String!
   email: String
-  password: String!
   firstName: String
   lastName: String
+  profilePicture: String!
   channelDescription: String
-  isBlocked: Boolean
-  isDeleted: Boolean
   role: Role
+  registrationDate: DateTime
+  isBlocked: Boolean
   subscribers: [User!]!
 }
 
@@ -25,6 +25,7 @@ type Video {
   isCommentingAllowed: Boolean!
   isRatingVisible: Boolean!
   isBlocked: Boolean
+  dateUploaded: DateTime!
   views: Int!
   uploader: User!
 }
@@ -40,6 +41,7 @@ type Comment {
   content: String!
   author: User!
   video: Video!
+  datePosted: DateTime!
 }
 
 type Query {

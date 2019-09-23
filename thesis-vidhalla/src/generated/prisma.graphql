@@ -1,5 +1,5 @@
 # source: http://localhost:4466
-# timestamp: Wed Sep 11 2019 23:49:12 GMT+0200 (Central European Summer Time)
+# timestamp: Mon Sep 23 2019 16:07:57 GMT+0200 (Central European Summer Time)
 
 type AggregateComment {
   count: Int!
@@ -31,6 +31,8 @@ type Comment implements Node {
   content: String!
   likes: Int!
   dislikes: Int!
+  isDeleted: Boolean!
+  datePosted: DateTime!
   video(where: VideoWhereInput): Video!
   author(where: UserWhereInput): User!
 }
@@ -49,6 +51,8 @@ input CommentCreateInput {
   content: String!
   likes: Int!
   dislikes: Int!
+  isDeleted: Boolean!
+  datePosted: DateTime!
   video: VideoCreateOneWithoutCommentsInput!
   author: UserCreateOneWithoutCommentsPostedInput!
 }
@@ -72,6 +76,8 @@ input CommentCreateWithoutAuthorInput {
   content: String!
   likes: Int!
   dislikes: Int!
+  isDeleted: Boolean!
+  datePosted: DateTime!
   video: VideoCreateOneWithoutCommentsInput!
 }
 
@@ -79,6 +85,8 @@ input CommentCreateWithoutVideoInput {
   content: String!
   likes: Int!
   dislikes: Int!
+  isDeleted: Boolean!
+  datePosted: DateTime!
   author: UserCreateOneWithoutCommentsPostedInput!
 }
 
@@ -100,6 +108,10 @@ enum CommentOrderByInput {
   likes_DESC
   dislikes_ASC
   dislikes_DESC
+  isDeleted_ASC
+  isDeleted_DESC
+  datePosted_ASC
+  datePosted_DESC
   updatedAt_ASC
   updatedAt_DESC
   createdAt_ASC
@@ -111,6 +123,8 @@ type CommentPreviousValues {
   content: String!
   likes: Int!
   dislikes: Int!
+  isDeleted: Boolean!
+  datePosted: DateTime!
 }
 
 type CommentSubscriptionPayload {
@@ -156,6 +170,8 @@ input CommentUpdateDataInput {
   content: String
   likes: Int
   dislikes: Int
+  isDeleted: Boolean
+  datePosted: DateTime
   video: VideoUpdateOneWithoutCommentsInput
   author: UserUpdateOneWithoutCommentsPostedInput
 }
@@ -164,6 +180,8 @@ input CommentUpdateInput {
   content: String
   likes: Int
   dislikes: Int
+  isDeleted: Boolean
+  datePosted: DateTime
   video: VideoUpdateOneWithoutCommentsInput
   author: UserUpdateOneWithoutCommentsPostedInput
 }
@@ -198,6 +216,8 @@ input CommentUpdateWithoutAuthorDataInput {
   content: String
   likes: Int
   dislikes: Int
+  isDeleted: Boolean
+  datePosted: DateTime
   video: VideoUpdateOneWithoutCommentsInput
 }
 
@@ -205,6 +225,8 @@ input CommentUpdateWithoutVideoDataInput {
   content: String
   likes: Int
   dislikes: Int
+  isDeleted: Boolean
+  datePosted: DateTime
   author: UserUpdateOneWithoutCommentsPostedInput
 }
 
@@ -239,6 +261,7 @@ type CommentVote implements Node {
   id: ID!
   author(where: UserWhereInput): User!
   comment(where: CommentWhereInput): Comment!
+  dateCreated: DateTime!
   type: VoteType!
 }
 
@@ -253,6 +276,7 @@ type CommentVoteConnection {
 }
 
 input CommentVoteCreateInput {
+  dateCreated: DateTime!
   type: VoteType!
   author: UserCreateOneInput!
   comment: CommentCreateOneInput!
@@ -270,6 +294,8 @@ type CommentVoteEdge {
 enum CommentVoteOrderByInput {
   id_ASC
   id_DESC
+  dateCreated_ASC
+  dateCreated_DESC
   type_ASC
   type_DESC
   updatedAt_ASC
@@ -280,6 +306,7 @@ enum CommentVoteOrderByInput {
 
 type CommentVotePreviousValues {
   id: ID!
+  dateCreated: DateTime!
   type: VoteType!
 }
 
@@ -323,6 +350,7 @@ input CommentVoteSubscriptionWhereInput {
 }
 
 input CommentVoteUpdateInput {
+  dateCreated: DateTime
   type: VoteType
   author: UserUpdateOneInput
   comment: CommentUpdateOneInput
@@ -377,6 +405,28 @@ input CommentVoteWhereInput {
 
   """All values not ending with the given string."""
   id_not_ends_with: ID
+  dateCreated: DateTime
+
+  """All values that are not equal to given value."""
+  dateCreated_not: DateTime
+
+  """All values that are contained in given list."""
+  dateCreated_in: [DateTime!]
+
+  """All values that are not contained in given list."""
+  dateCreated_not_in: [DateTime!]
+
+  """All values less than the given value."""
+  dateCreated_lt: DateTime
+
+  """All values less than or equal the given value."""
+  dateCreated_lte: DateTime
+
+  """All values greater than the given value."""
+  dateCreated_gt: DateTime
+
+  """All values greater than or equal the given value."""
+  dateCreated_gte: DateTime
   type: VoteType
 
   """All values that are not equal to given value."""
@@ -528,6 +578,32 @@ input CommentWhereInput {
 
   """All values greater than or equal the given value."""
   dislikes_gte: Int
+  isDeleted: Boolean
+
+  """All values that are not equal to given value."""
+  isDeleted_not: Boolean
+  datePosted: DateTime
+
+  """All values that are not equal to given value."""
+  datePosted_not: DateTime
+
+  """All values that are contained in given list."""
+  datePosted_in: [DateTime!]
+
+  """All values that are not contained in given list."""
+  datePosted_not_in: [DateTime!]
+
+  """All values less than the given value."""
+  datePosted_lt: DateTime
+
+  """All values less than or equal the given value."""
+  datePosted_lte: DateTime
+
+  """All values greater than the given value."""
+  datePosted_gt: DateTime
+
+  """All values greater than or equal the given value."""
+  datePosted_gte: DateTime
   video: VideoWhereInput
   author: UserWhereInput
 }
@@ -535,6 +611,8 @@ input CommentWhereInput {
 input CommentWhereUniqueInput {
   id: ID
 }
+
+scalar DateTime
 
 """
 The `Long` scalar type represents non-fractional signed whole numeric values.
@@ -648,7 +726,9 @@ type User implements Node {
   profilePicture: String!
   channelDescription: String
   isBlocked: Boolean!
-  role: Role
+  isDeleted: Boolean!
+  role: Role!
+  registrationDate: DateTime!
   subscribers(where: UserWhereInput, orderBy: UserOrderByInput, skip: Int, after: String, before: String, first: Int, last: Int): [User!]
   videosUploaded(where: VideoWhereInput, orderBy: VideoOrderByInput, skip: Int, after: String, before: String, first: Int, last: Int): [Video!]
   commentsPosted(where: CommentWhereInput, orderBy: CommentOrderByInput, skip: Int, after: String, before: String, first: Int, last: Int): [Comment!]
@@ -669,10 +749,12 @@ input UserCreateInput {
   password: String!
   firstName: String
   lastName: String
-  profilePicture: String!
+  profilePicture: String
   channelDescription: String
   isBlocked: Boolean!
-  role: Role
+  isDeleted: Boolean!
+  role: Role!
+  registrationDate: DateTime!
   subscribers: UserCreateManyInput
   videosUploaded: VideoCreateManyWithoutUploaderInput
   commentsPosted: CommentCreateManyWithoutAuthorInput
@@ -703,10 +785,12 @@ input UserCreateWithoutCommentsPostedInput {
   password: String!
   firstName: String
   lastName: String
-  profilePicture: String!
+  profilePicture: String
   channelDescription: String
   isBlocked: Boolean!
-  role: Role
+  isDeleted: Boolean!
+  role: Role!
+  registrationDate: DateTime!
   subscribers: UserCreateManyInput
   videosUploaded: VideoCreateManyWithoutUploaderInput
 }
@@ -716,10 +800,12 @@ input UserCreateWithoutVideosUploadedInput {
   password: String!
   firstName: String
   lastName: String
-  profilePicture: String!
+  profilePicture: String
   channelDescription: String
   isBlocked: Boolean!
-  role: Role
+  isDeleted: Boolean!
+  role: Role!
+  registrationDate: DateTime!
   subscribers: UserCreateManyInput
   commentsPosted: CommentCreateManyWithoutAuthorInput
 }
@@ -750,8 +836,12 @@ enum UserOrderByInput {
   channelDescription_DESC
   isBlocked_ASC
   isBlocked_DESC
+  isDeleted_ASC
+  isDeleted_DESC
   role_ASC
   role_DESC
+  registrationDate_ASC
+  registrationDate_DESC
   updatedAt_ASC
   updatedAt_DESC
   createdAt_ASC
@@ -767,7 +857,9 @@ type UserPreviousValues {
   profilePicture: String!
   channelDescription: String
   isBlocked: Boolean!
-  role: Role
+  isDeleted: Boolean!
+  role: Role!
+  registrationDate: DateTime!
 }
 
 type UserSubscriptionPayload {
@@ -817,7 +909,9 @@ input UserUpdateDataInput {
   profilePicture: String
   channelDescription: String
   isBlocked: Boolean
+  isDeleted: Boolean
   role: Role
+  registrationDate: DateTime
   subscribers: UserUpdateManyInput
   videosUploaded: VideoUpdateManyWithoutUploaderInput
   commentsPosted: CommentUpdateManyWithoutAuthorInput
@@ -831,7 +925,9 @@ input UserUpdateInput {
   profilePicture: String
   channelDescription: String
   isBlocked: Boolean
+  isDeleted: Boolean
   role: Role
+  registrationDate: DateTime
   subscribers: UserUpdateManyInput
   videosUploaded: VideoUpdateManyWithoutUploaderInput
   commentsPosted: CommentUpdateManyWithoutAuthorInput
@@ -878,7 +974,9 @@ input UserUpdateWithoutCommentsPostedDataInput {
   profilePicture: String
   channelDescription: String
   isBlocked: Boolean
+  isDeleted: Boolean
   role: Role
+  registrationDate: DateTime
   subscribers: UserUpdateManyInput
   videosUploaded: VideoUpdateManyWithoutUploaderInput
 }
@@ -891,7 +989,9 @@ input UserUpdateWithoutVideosUploadedDataInput {
   profilePicture: String
   channelDescription: String
   isBlocked: Boolean
+  isDeleted: Boolean
   role: Role
+  registrationDate: DateTime
   subscribers: UserUpdateManyInput
   commentsPosted: CommentUpdateManyWithoutAuthorInput
 }
@@ -1215,6 +1315,10 @@ input UserWhereInput {
 
   """All values that are not equal to given value."""
   isBlocked_not: Boolean
+  isDeleted: Boolean
+
+  """All values that are not equal to given value."""
+  isDeleted_not: Boolean
   role: Role
 
   """All values that are not equal to given value."""
@@ -1225,6 +1329,28 @@ input UserWhereInput {
 
   """All values that are not contained in given list."""
   role_not_in: [Role!]
+  registrationDate: DateTime
+
+  """All values that are not equal to given value."""
+  registrationDate_not: DateTime
+
+  """All values that are contained in given list."""
+  registrationDate_in: [DateTime!]
+
+  """All values that are not contained in given list."""
+  registrationDate_not_in: [DateTime!]
+
+  """All values less than the given value."""
+  registrationDate_lt: DateTime
+
+  """All values less than or equal the given value."""
+  registrationDate_lte: DateTime
+
+  """All values greater than the given value."""
+  registrationDate_gt: DateTime
+
+  """All values greater than or equal the given value."""
+  registrationDate_gte: DateTime
   subscribers_every: UserWhereInput
   subscribers_some: UserWhereInput
   subscribers_none: UserWhereInput
@@ -1249,7 +1375,9 @@ type Video implements Node {
   visibility: Visibility!
   isCommentingAllowed: Boolean!
   isRatingVisible: Boolean!
-  isBlocked: Boolean
+  isBlocked: Boolean!
+  isDeleted: Boolean!
+  dateUploaded: DateTime!
   views: Int!
   likes: Int!
   dislikes: Int!
@@ -1272,9 +1400,11 @@ input VideoCreateInput {
   title: String!
   description: String
   visibility: Visibility!
-  isCommentingAllowed: Boolean!
-  isRatingVisible: Boolean!
-  isBlocked: Boolean
+  isCommentingAllowed: Boolean
+  isRatingVisible: Boolean
+  isBlocked: Boolean!
+  isDeleted: Boolean!
+  dateUploaded: DateTime!
   views: Int!
   likes: Int!
   dislikes: Int!
@@ -1302,9 +1432,11 @@ input VideoCreateWithoutCommentsInput {
   title: String!
   description: String
   visibility: Visibility!
-  isCommentingAllowed: Boolean!
-  isRatingVisible: Boolean!
-  isBlocked: Boolean
+  isCommentingAllowed: Boolean
+  isRatingVisible: Boolean
+  isBlocked: Boolean!
+  isDeleted: Boolean!
+  dateUploaded: DateTime!
   views: Int!
   likes: Int!
   dislikes: Int!
@@ -1316,9 +1448,11 @@ input VideoCreateWithoutUploaderInput {
   title: String!
   description: String
   visibility: Visibility!
-  isCommentingAllowed: Boolean!
-  isRatingVisible: Boolean!
-  isBlocked: Boolean
+  isCommentingAllowed: Boolean
+  isRatingVisible: Boolean
+  isBlocked: Boolean!
+  isDeleted: Boolean!
+  dateUploaded: DateTime!
   views: Int!
   likes: Int!
   dislikes: Int!
@@ -1351,6 +1485,10 @@ enum VideoOrderByInput {
   isRatingVisible_DESC
   isBlocked_ASC
   isBlocked_DESC
+  isDeleted_ASC
+  isDeleted_DESC
+  dateUploaded_ASC
+  dateUploaded_DESC
   views_ASC
   views_DESC
   likes_ASC
@@ -1371,7 +1509,9 @@ type VideoPreviousValues {
   visibility: Visibility!
   isCommentingAllowed: Boolean!
   isRatingVisible: Boolean!
-  isBlocked: Boolean
+  isBlocked: Boolean!
+  isDeleted: Boolean!
+  dateUploaded: DateTime!
   views: Int!
   likes: Int!
   dislikes: Int!
@@ -1424,6 +1564,8 @@ input VideoUpdateDataInput {
   isCommentingAllowed: Boolean
   isRatingVisible: Boolean
   isBlocked: Boolean
+  isDeleted: Boolean
+  dateUploaded: DateTime
   views: Int
   likes: Int
   dislikes: Int
@@ -1439,6 +1581,8 @@ input VideoUpdateInput {
   isCommentingAllowed: Boolean
   isRatingVisible: Boolean
   isBlocked: Boolean
+  isDeleted: Boolean
+  dateUploaded: DateTime
   views: Int
   likes: Int
   dislikes: Int
@@ -1479,6 +1623,8 @@ input VideoUpdateWithoutCommentsDataInput {
   isCommentingAllowed: Boolean
   isRatingVisible: Boolean
   isBlocked: Boolean
+  isDeleted: Boolean
+  dateUploaded: DateTime
   views: Int
   likes: Int
   dislikes: Int
@@ -1493,6 +1639,8 @@ input VideoUpdateWithoutUploaderDataInput {
   isCommentingAllowed: Boolean
   isRatingVisible: Boolean
   isBlocked: Boolean
+  isDeleted: Boolean
+  dateUploaded: DateTime
   views: Int
   likes: Int
   dislikes: Int
@@ -1524,6 +1672,7 @@ type VideoVote implements Node {
   id: ID!
   author(where: UserWhereInput): User!
   video(where: VideoWhereInput): Video!
+  dateCreated: DateTime!
   type: VoteType
 }
 
@@ -1538,6 +1687,7 @@ type VideoVoteConnection {
 }
 
 input VideoVoteCreateInput {
+  dateCreated: DateTime!
   type: VoteType
   author: UserCreateOneInput!
   video: VideoCreateOneInput!
@@ -1555,6 +1705,8 @@ type VideoVoteEdge {
 enum VideoVoteOrderByInput {
   id_ASC
   id_DESC
+  dateCreated_ASC
+  dateCreated_DESC
   type_ASC
   type_DESC
   updatedAt_ASC
@@ -1565,6 +1717,7 @@ enum VideoVoteOrderByInput {
 
 type VideoVotePreviousValues {
   id: ID!
+  dateCreated: DateTime!
   type: VoteType
 }
 
@@ -1608,6 +1761,7 @@ input VideoVoteSubscriptionWhereInput {
 }
 
 input VideoVoteUpdateInput {
+  dateCreated: DateTime
   type: VoteType
   author: UserUpdateOneInput
   video: VideoUpdateOneInput
@@ -1662,6 +1816,28 @@ input VideoVoteWhereInput {
 
   """All values not ending with the given string."""
   id_not_ends_with: ID
+  dateCreated: DateTime
+
+  """All values that are not equal to given value."""
+  dateCreated_not: DateTime
+
+  """All values that are contained in given list."""
+  dateCreated_in: [DateTime!]
+
+  """All values that are not contained in given list."""
+  dateCreated_not_in: [DateTime!]
+
+  """All values less than the given value."""
+  dateCreated_lt: DateTime
+
+  """All values less than or equal the given value."""
+  dateCreated_lte: DateTime
+
+  """All values greater than the given value."""
+  dateCreated_gt: DateTime
+
+  """All values greater than or equal the given value."""
+  dateCreated_gte: DateTime
   type: VoteType
 
   """All values that are not equal to given value."""
@@ -1871,6 +2047,32 @@ input VideoWhereInput {
 
   """All values that are not equal to given value."""
   isBlocked_not: Boolean
+  isDeleted: Boolean
+
+  """All values that are not equal to given value."""
+  isDeleted_not: Boolean
+  dateUploaded: DateTime
+
+  """All values that are not equal to given value."""
+  dateUploaded_not: DateTime
+
+  """All values that are contained in given list."""
+  dateUploaded_in: [DateTime!]
+
+  """All values that are not contained in given list."""
+  dateUploaded_not_in: [DateTime!]
+
+  """All values less than the given value."""
+  dateUploaded_lt: DateTime
+
+  """All values less than or equal the given value."""
+  dateUploaded_lte: DateTime
+
+  """All values greater than the given value."""
+  dateUploaded_gt: DateTime
+
+  """All values greater than or equal the given value."""
+  dateUploaded_gte: DateTime
   views: Int
 
   """All values that are not equal to given value."""

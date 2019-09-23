@@ -1,5 +1,4 @@
 import { GraphQLServer, PubSub } from "graphql-yoga";
-import uuid from "uuid/v4";
 import db from "./db";
 import { resolvers, fragmentReplacements } from "./resolvers/index";
 import prisma from "./prisma";
